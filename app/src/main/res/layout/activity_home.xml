@@ -54,7 +54,7 @@
         >
 
         <ImageButton
-            android:id="@+id/Add"
+            android:id="@+id/btn_add_alarm"
 
             android:padding="8dp"
             android:layout_width="48dp"

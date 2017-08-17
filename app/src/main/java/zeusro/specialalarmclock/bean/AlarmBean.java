@@ -1,9 +1,13 @@
-package zeusro.specialalarmclock;
+package zeusro.specialalarmclock.bean;
+
+import zeusro.specialalarmclock.Key;
+import zeusro.specialalarmclock.Type;
 
 /**
+ *
  * Created by Z on 2015/11/16.
  */
-public class AlarmPreference {
+public class AlarmBean {
 
     private Key key;
     private String title;
@@ -12,17 +16,17 @@ public class AlarmPreference {
     private String[] options;
     private Type type;
 
-    public AlarmPreference(Key key, Object value, Type type) {
+    public AlarmBean(Key key, Object value, Type type) {
         this(key,null,null,null, value, type);
     }
 
-    public AlarmPreference(Key key,String title, String summary, String[] options, Object value, Type type) {
-        setTitle(title);
-        setSummary(summary);
-        setOptions(options);
-        setKey(key);
-        setValue(value);
-        setType(type);
+    public AlarmBean(Key key, String title, String summary, String[] options, Object value, Type type) {
+        this.key = key;
+        this.title = title;
+        this.summary = summary;
+        this.value = value;
+        this.options = options;
+        this.type = type;
     }
 
     public Key getKey() {

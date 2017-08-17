@@ -23,7 +23,7 @@ import zeusro.specialalarmclock.service.SchedulingService;
 /**
  *
  */
-public class AlarmServiceBroadcastReciever extends WakefulBroadcastReceiver {
+public class AlarmServiceBroadcastReceiver extends WakefulBroadcastReceiver {
 
     Alarm alarm;
 
@@ -40,7 +40,7 @@ public class AlarmServiceBroadcastReciever extends WakefulBroadcastReceiver {
             //            11-27 13:43:39.020 14674-14674/zeusro.specialalarmclock D/TEST: null
 //            11-27 13:43:39.020 14674-14674/zeusro.specialalarmclock D/TEST: android.intent.extra.ALARM_COUNT
 //            11-27 13:43:39.020 14674-14674/zeusro.specialalarmclock D/TEST: 1
-//            11-27 13:43:39.020 14674-14674/zeusro.specialalarmclock D/AlarmServiceBroadcastReciever: false
+//            11-27 13:43:39.020 14674-14674/zeusro.specialalarmclock D/AlarmServiceBroadcastReceiver: false
 //            Log.d("TEST", String.valueOf(intent.getAction()));
 //            Bundle bundle = intent.getExtras();
 
@@ -74,7 +74,7 @@ public class AlarmServiceBroadcastReciever extends WakefulBroadcastReceiver {
 
     public void setAlarm(Context context, Alarm alarm) {
         Log.d(this.getClass().getSimpleName(), Thread.currentThread().getStackTrace()[2].getMethodName());
-        Intent intent = new Intent(context, AlarmServiceBroadcastReciever.class);
+        Intent intent = new Intent(context, AlarmServiceBroadcastReceiver.class);
         alarmIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
         if (alarm == null)
             alarm = getNext(context);
@@ -115,7 +115,7 @@ public class AlarmServiceBroadcastReciever extends WakefulBroadcastReceiver {
     // BEGIN_INCLUDE(cancel_alarm)
     public void CancelAlarm(Context context) {
         if (null == alarmIntent) {
-            Intent intent = new Intent(context, AlarmServiceBroadcastReciever.class);
+            Intent intent = new Intent(context, AlarmServiceBroadcastReceiver.class);
             alarmIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
         }
         // If the alarm has been set, cancel it.

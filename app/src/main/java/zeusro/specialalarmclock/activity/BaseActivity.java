@@ -10,21 +10,22 @@ import java.lang.reflect.Field;
 
 import zeusro.specialalarmclock.Alarm;
 import zeusro.specialalarmclock.R;
-import zeusro.specialalarmclock.receiver.AlarmServiceBroadcastReciever;
+import zeusro.specialalarmclock.receiver.AlarmServiceBroadcastReceiver;
 
 /**
+ *
  * Created by Z on 2015/11/16.
  */
 public class BaseActivity extends AppCompatActivity implements android.view.View.OnClickListener {
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-        actionBar.setCustomView(R.layout.middle_title_actionbar);
-
+        if(actionBar!=null){
+            actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+            actionBar.setCustomView(R.layout.middle_title_actionbar);
+        }
         try {
             ViewConfiguration config = ViewConfiguration.get(this);
             Field menuKeyField = ViewConfiguration.class.getDeclaredField("sHasPermanentMenuKey");
@@ -47,24 +48,16 @@ public class BaseActivity extends AppCompatActivity implements android.view.View
 
     }
 
-
-    protected void  CancelAlarmServiceBroadcastReciever(){
-        AlarmServiceBroadcastReciever reciever = new AlarmServiceBroadcastReciever();
-        reciever.CancelAlarm(this);
+    protected void cancelAlarmServiceBroadcastReceiver(){
+        AlarmServiceBroadcastReceiver receiver = new AlarmServiceBroadcastReceiver();
+        receiver.CancelAlarm(this);
     }
 
     /**
      * 设置闹钟服务
      */
-    protected void CallAlarmServiceBroadcastReciever(Alarm alarm) {
-
-//        Intent serviceIntent = new Intent(this, AlarmService.class);
-//        this.startService(serviceIntent);
-        AlarmServiceBroadcastReciever reciever = new AlarmServiceBroadcastReciever();
-        reciever.setAlarm(this, alarm);
-//        bindService()
-
-//        Intent serviceIntent = new Intent(this, AlarmServiceBroadcastReciever.class);
-//        this.startService(serviceIntent);
+    protected void callAlarmServiceBroadcastReceiver(Alarm alarm) {
+        AlarmServiceBroadcastReceiver receiver = new AlarmServiceBroadcastReceiver();
+        receiver.setAlarm(this, alarm);
     }
 }

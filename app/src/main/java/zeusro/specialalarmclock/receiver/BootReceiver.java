@@ -9,7 +9,7 @@ public class BootReceiver extends BroadcastReceiver {
     public BootReceiver() {
     }
 
-    AlarmServiceBroadcastReciever alarm = new AlarmServiceBroadcastReciever();
+    AlarmServiceBroadcastReceiver alarm = new AlarmServiceBroadcastReceiver();
 
     @Override
     public void onReceive(Context context, Intent intent) {

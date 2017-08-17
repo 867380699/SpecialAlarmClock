@@ -6,7 +6,7 @@ import android.util.Log;
 
 import zeusro.specialalarmclock.Alarm;
 import zeusro.specialalarmclock.activity.AlarmAlertActivity;
-import zeusro.specialalarmclock.receiver.AlarmServiceBroadcastReciever;
+import zeusro.specialalarmclock.receiver.AlarmServiceBroadcastReceiver;
 
 public class SchedulingService extends IntentService {
     public SchedulingService() {
@@ -21,7 +21,7 @@ public class SchedulingService extends IntentService {
         alarmAlertActivityIntent.putExtra("alarm", alarm);
         alarmAlertActivityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         getApplicationContext().startActivity(alarmAlertActivityIntent);
-        AlarmServiceBroadcastReciever.completeWakefulIntent(intent);
+        AlarmServiceBroadcastReceiver.completeWakefulIntent(intent);
     }
 
 }

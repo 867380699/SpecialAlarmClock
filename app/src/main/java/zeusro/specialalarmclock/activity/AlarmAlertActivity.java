@@ -18,7 +18,7 @@ import android.widget.Toast;
 import zeusro.specialalarmclock.Alarm;
 import zeusro.specialalarmclock.R;
 import zeusro.specialalarmclock.StaticWakeLock;
-import zeusro.specialalarmclock.receiver.AlarmServiceBroadcastReciever;
+import zeusro.specialalarmclock.receiver.AlarmServiceBroadcastReceiver;
 import zeusro.specialalarmclock.view.SlideView;
 
 public class AlarmAlertActivity extends AppCompatActivity implements View.OnClickListener {
@@ -78,7 +78,7 @@ public class AlarmAlertActivity extends AppCompatActivity implements View.OnClic
         slideView.setSlideListener(new SlideView.SlideListener() {
             @Override
             public void onDone() {
-                AlarmServiceBroadcastReciever reciever = new AlarmServiceBroadcastReciever();
+                AlarmServiceBroadcastReceiver reciever = new AlarmServiceBroadcastReceiver();
                 reciever.CancelAlarm(AlarmAlertActivity.this);
                 ReleaseRelease();
                 Toast.makeText(AlarmAlertActivity.this, "早起啦", Toast.LENGTH_SHORT).show();
