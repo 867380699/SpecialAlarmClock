@@ -31,34 +31,27 @@ import zeusro.specialalarmclock.R;
 import zeusro.specialalarmclock.Type;
 
 /**
-<<<<<<< HEAD
  * Adapter
-=======
->>>>>>> 07eff01528c717314da55e35c4690b93aa7429b1
+ * <p>
  * Created by Z on 2015/11/16.
  */
 
 public class AlarmSettingItemListAdapter extends BaseAdapter {
-<<<<<<< HEAD
-    public static final String TAG = "AlarmSettingListAdapter";
-=======
 
->>>>>>> 07eff01528c717314da55e35c4690b93aa7429b1
+    public static final String TAG = "AlarmSettingListAdapter";
+    private final String[] repeatDays = {"一", "二", "三", "四", "五", "六", "日"};
     private Context context;
     private Alarm alarm;
     private List<AlarmPreference> preferences = new ArrayList<AlarmPreference>();
-    private final String[] repeatDays = {"一", "二", "三", "四", "五", "六", "日"};
     private String[] alarmTones;
     private String[] alarmTonePaths;
 
     public AlarmSettingItemListAdapter(Context context, Alarm alarm) {
         this.context = (context);
 
-<<<<<<< HEAD
+
         Log.d(TAG, "Loading Ringtones...");
-=======
-        Log.d("AlarmSettingItemListAdapter", "Loading Ringtones...");
->>>>>>> 07eff01528c717314da55e35c4690b93aa7429b1
+
 
         RingtoneManager ringtoneMgr = new RingtoneManager(getContext());
         ringtoneMgr.setType(RingtoneManager.TYPE_ALARM);
@@ -75,11 +68,8 @@ public class AlarmSettingItemListAdapter extends BaseAdapter {
                 alarmTonePaths[alarmsCursor.getPosition() + 1] = ringtoneMgr.getRingtoneUri(alarmsCursor.getPosition()).toString();
             } while (alarmsCursor.moveToNext());
         }
-<<<<<<< HEAD
+
         Log.d(TAG, "Finished Loading " + alarmTones.length + " Ringtones.");
-=======
-        Log.d("AlarmSettingItemListAdapter", "Finished Loading " + alarmTones.length + " Ringtones.");
->>>>>>> 07eff01528c717314da55e35c4690b93aa7429b1
         alarmsCursor.close();
         setMathAlarm(alarm);
     }
@@ -238,8 +228,7 @@ public class AlarmSettingItemListAdapter extends BaseAdapter {
         }
 
     }
-
-
+    
     public void setMathAlarm(Alarm alarm) {
         this.alarm = alarm;
         preferences.clear();
@@ -260,11 +249,9 @@ public class AlarmSettingItemListAdapter extends BaseAdapter {
         preferences.add(new AlarmPreference(Key.ALARM_VIBRATE, "振动", null, null, alarm.IsVibrate(), Type.BOOLEAN));
     }
 
-
     public Context getContext() {
         return context;
     }
-
 
     public String[] getAlarmTones() {
         return alarmTones;

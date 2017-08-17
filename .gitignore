@@ -31,19 +31,13 @@ proguard/
 # Android Studio captures folder
 captures/
 
-<<<<<<< HEAD
+
 # key store
 *.jks
-=======
-
->>>>>>> 07eff01528c717314da55e35c4690b93aa7429b1
 
 *.iml
 /.idea/
 .DS_Store
 
 /app/build/
-<<<<<<< HEAD
 
-=======
->>>>>>> 07eff01528c717314da55e35c4690b93aa7429b1

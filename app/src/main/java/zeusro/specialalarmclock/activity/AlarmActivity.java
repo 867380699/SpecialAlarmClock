@@ -2,7 +2,7 @@ package zeusro.specialalarmclock.activity;
 
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
-<<<<<<< HEAD
+
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
@@ -10,11 +10,7 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
-=======
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
-import android.content.Intent;
->>>>>>> 07eff01528c717314da55e35c4690b93aa7429b1
+
 import android.os.Bundle;
 import android.util.Log;
 import android.view.HapticFeedbackConstants;
@@ -27,7 +23,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-<<<<<<< HEAD
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -36,8 +32,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-=======
->>>>>>> 07eff01528c717314da55e35c4690b93aa7429b1
+
+
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -240,18 +236,12 @@ public class AlarmActivity extends BaseActivity {
 
     @Override
     public void onBackPressed() {
-<<<<<<< HEAD
+
         if (!isExit) {
             isExit = true; // 准备退出
             Toast.makeText(this, "再按一次退出", Toast.LENGTH_SHORT).show();
             Timer tExit = new Timer();
-=======
-        Timer tExit = null;
-        if (isExit == false) {
-            isExit = true; // 准备退出
-            Toast.makeText(this, "再按一次退出", Toast.LENGTH_SHORT).show();
-            tExit = new Timer();
->>>>>>> 07eff01528c717314da55e35c4690b93aa7429b1
+
             tExit.schedule(new TimerTask() {
                 @Override
                 public void run() {
@@ -271,10 +261,9 @@ public class AlarmActivity extends BaseActivity {
                 @Override
                 public void onClick(View v) {
                     CreateNotification(null);
-<<<<<<< HEAD
+
                     getHoliday();
-=======
->>>>>>> 07eff01528c717314da55e35c4690b93aa7429b1
+
 //                    Toast.makeText(AlarmActivity.this, "该功能见鬼中", Toast.LENGTH_SHORT).show();
 //                    finish();
                 }
@@ -288,7 +277,7 @@ public class AlarmActivity extends BaseActivity {
         intent.setClass(this, NotificationWakeUpReceiver.class);
         sendBroadcast(intent);//发送广播事件
     }
-<<<<<<< HEAD
+
 
     private void getHoliday(){
         new GetHolidayTask(new DownloadCallback<String>() {
@@ -407,7 +396,4 @@ public class AlarmActivity extends BaseActivity {
         return buffer.toString();
     }
 
-
-=======
->>>>>>> 07eff01528c717314da55e35c4690b93aa7429b1
 }
