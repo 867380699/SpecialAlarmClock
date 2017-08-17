@@ -2,9 +2,26 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
+<<<<<<< HEAD
               android:paddingBottom="8dp"
               android:orientation="vertical">
     <zeusro.specialalarmclock.view.MyTimePicker
+=======
+              android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:linksClickable="false"
+        android:text="时间"
+        android:textAppearance="?attr/textAppearanceListItem"
+        android:layout_marginTop="8dp"
+        android:textSize="18sp"
+        android:layout_marginLeft="10dp"/>
+
+    <TimePicker
+>>>>>>> 07eff01528c717314da55e35c4690b93aa7429b1
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/timePicker"/>

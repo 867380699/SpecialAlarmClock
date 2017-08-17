@@ -2,6 +2,7 @@
 <manifest
     package="anroidframework.eshore.gdtel.com.alarmtestmodule"
     xmlns:android="http://schemas.android.com/apk/res/android">
+<<<<<<< HEAD
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 
@@ -9,6 +10,8 @@
     <uses-permission android:name="android.permission.VIBRATE"/>
     <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+=======
+>>>>>>> 07eff01528c717314da55e35c4690b93aa7429b1
 
     <application
         android:allowBackup="true"
@@ -17,7 +20,17 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
+<<<<<<< HEAD
 
+=======
+        <uses-permission android:name="android.permission.WAKE_LOCK"></uses-permission>
+        <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"></uses-permission>
+
+        <uses-permission android:name="android.permission.INTERNET"/>
+        <uses-permission android:name="android.permission.VIBRATE"/>
+        <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+        <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+>>>>>>> 07eff01528c717314da55e35c4690b93aa7429b1
 
 
         <activity
@@ -41,6 +54,7 @@
             android:enabled="true"
             android:exported="true">
             <intent-filter>
+<<<<<<< HEAD
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
         </receiver>
@@ -49,6 +63,16 @@
             <!--android:enabled="true"-->
             <!--android:exported="true">-->
         <!--</receiver>-->
+=======
+                <action android:name="android.intent.action.BOOT_COMPLETED"></action>
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name=".SampleSchedulingService"
+            android:enabled="true"
+            android:exported="true">
+        </receiver>
+>>>>>>> 07eff01528c717314da55e35c4690b93aa7429b1
     </application>
 
 </manifest>

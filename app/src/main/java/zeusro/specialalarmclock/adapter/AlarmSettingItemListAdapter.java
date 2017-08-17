@@ -31,12 +31,19 @@ import zeusro.specialalarmclock.R;
 import zeusro.specialalarmclock.Type;
 
 /**
+<<<<<<< HEAD
  * Adapter
+=======
+>>>>>>> 07eff01528c717314da55e35c4690b93aa7429b1
  * Created by Z on 2015/11/16.
  */
 
 public class AlarmSettingItemListAdapter extends BaseAdapter {
+<<<<<<< HEAD
     public static final String TAG = "AlarmSettingListAdapter";
+=======
+
+>>>>>>> 07eff01528c717314da55e35c4690b93aa7429b1
     private Context context;
     private Alarm alarm;
     private List<AlarmPreference> preferences = new ArrayList<AlarmPreference>();
@@ -47,7 +54,11 @@ public class AlarmSettingItemListAdapter extends BaseAdapter {
     public AlarmSettingItemListAdapter(Context context, Alarm alarm) {
         this.context = (context);
 
+<<<<<<< HEAD
         Log.d(TAG, "Loading Ringtones...");
+=======
+        Log.d("AlarmSettingItemListAdapter", "Loading Ringtones...");
+>>>>>>> 07eff01528c717314da55e35c4690b93aa7429b1
 
         RingtoneManager ringtoneMgr = new RingtoneManager(getContext());
         ringtoneMgr.setType(RingtoneManager.TYPE_ALARM);
@@ -64,7 +75,11 @@ public class AlarmSettingItemListAdapter extends BaseAdapter {
                 alarmTonePaths[alarmsCursor.getPosition() + 1] = ringtoneMgr.getRingtoneUri(alarmsCursor.getPosition()).toString();
             } while (alarmsCursor.moveToNext());
         }
+<<<<<<< HEAD
         Log.d(TAG, "Finished Loading " + alarmTones.length + " Ringtones.");
+=======
+        Log.d("AlarmSettingItemListAdapter", "Finished Loading " + alarmTones.length + " Ringtones.");
+>>>>>>> 07eff01528c717314da55e35c4690b93aa7429b1
         alarmsCursor.close();
         setMathAlarm(alarm);
     }

@@ -55,6 +55,7 @@
 
         <ImageButton
             android:id="@+id/Add"
+<<<<<<< HEAD
             android:padding="8dp"
             android:layout_width="48dp"
             android:layout_height="48dp"
@@ -70,6 +71,21 @@
             android:layout_alignParentEnd="true"
             android:src="@android:drawable/ic_menu_manage"
             android:scaleType="centerInside"
+=======
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_alignParentLeft="true"
+            android:layout_weight="0.01"
+            android:src="@android:drawable/ic_input_add"/>
+
+        <ImageButton
+            android:id="@+id/Setting"
+            android:layout_width="50dp"
+            android:layout_height="60dp"
+            android:layout_alignParentRight="true"
+            android:layout_weight="0.05"
+            android:src="@android:drawable/ic_menu_manage"
+>>>>>>> 07eff01528c717314da55e35c4690b93aa7429b1
             />
     </RelativeLayout>
 

@@ -49,6 +49,7 @@ https://github.com/bedditor/ohtu-Alarmclock
 https://github.com/isaacloud/android-alarm-clock
 
 http://javatechig.com/android/repeat-alarm-example-in-android
+<<<<<<< HEAD
 
 https://developer.android.com/training/basics/network-ops/connecting.html
 
@@ -65,3 +66,5 @@ https://developer.android.com/training/basics/network-ops/connecting.html
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
     limitations under the License.
+=======
+>>>>>>> 07eff01528c717314da55e35c4690b93aa7429b1

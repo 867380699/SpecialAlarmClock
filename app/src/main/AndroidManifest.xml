@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest package="zeusro.specialalarmclock"
+<<<<<<< HEAD
           xmlns:android="http://schemas.android.com/apk/res/android">
+=======
+          xmlns:android="http://schemas.android.com/apk/res/android"
+          android:versionName="1.0.0">
+>>>>>>> 07eff01528c717314da55e35c4690b93aa7429b1
 
     <!-- 开机启动 -->
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
@@ -9,7 +14,10 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.INTERNET"/>
+<<<<<<< HEAD
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+=======
+>>>>>>> 07eff01528c717314da55e35c4690b93aa7429b1
 
     <application
         android:allowBackup="true"
