@@ -76,7 +76,7 @@ public class AlarmPreferencesActivity extends BaseActivity {
         Log.d(TAG, "Finished Loading " + alarmTones.length + " Ringtones.");
         alarmsCursor.close();
         setMathAlarm(alarm);
-
+//TEST
 
         etTitle = (EditText) findViewById(R.id.tagText);
         etTitle.setText(alarm.getAlarmName());
