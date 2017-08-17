@@ -2,9 +2,13 @@ package zeusro.specialalarmclock.activity;
 
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.HapticFeedbackConstants;
@@ -17,6 +21,14 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -219,11 +231,10 @@ public class AlarmActivity extends BaseActivity {
 
     @Override
     public void onBackPressed() {
-        Timer tExit = null;
-        if (isExit == false) {
+        if (!isExit) {
             isExit = true; // 准备退出
             Toast.makeText(this, "再按一次退出", Toast.LENGTH_SHORT).show();
-            tExit = new Timer();
+            Timer tExit = new Timer();
             tExit.schedule(new TimerTask() {
                 @Override
                 public void run() {
@@ -243,6 +254,7 @@ public class AlarmActivity extends BaseActivity {
                 @Override
                 public void onClick(View v) {
                     CreateNotification(null);
+                    getHoliday();
 //                    Toast.makeText(AlarmActivity.this, "该功能见鬼中", Toast.LENGTH_SHORT).show();
 //                    finish();
                 }
@@ -256,4 +268,123 @@ public class AlarmActivity extends BaseActivity {
         intent.setClass(this, NotificationWakeUpReceiver.class);
         sendBroadcast(intent);//发送广播事件
     }
+
+    private void getHoliday(){
+        new GetHolidayTask(new DownloadCallback<String>() {
+            @Override
+            public NetworkInfo getActiveNetworkInfo() {
+                ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+                return manager.getActiveNetworkInfo();
+            }
+
+            @Override
+            public void showResult(String result) {
+                Toast.makeText(AlarmActivity.this,result,Toast.LENGTH_SHORT).show();
+            }
+        }).execute();
+    }
+
+    public interface DownloadCallback<T>{
+        NetworkInfo getActiveNetworkInfo();
+
+        void showResult(T result);
+    }
+
+    private class GetHolidayTask extends AsyncTask<Void, Void, String>{
+        private DownloadCallback<String> callback;
+
+        public GetHolidayTask(DownloadCallback<String> callback) {
+            this.callback = callback;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            if(this.callback!=null){
+                NetworkInfo networkInfo = this.callback.getActiveNetworkInfo();
+                if(networkInfo==null || !networkInfo.isConnected()){
+                    cancel(true);
+                }
+            }
+        }
+
+        @Override
+        protected String doInBackground(Void... voids) {
+            if (!isCancelled()){
+                try {
+                    URL url = new URL("http://tool.bitefu.net/jiari?d=2017");
+                    String resultString = downloadUrl(url);
+                    if(resultString!=null){
+                        return resultString;
+                    }else{
+                        throw new IOException("No response received");
+                    }
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            if(result!=null && this.callback!=null){
+                this.callback.showResult(result);
+            }
+        }
+
+        @Override
+        protected void onCancelled() {
+            super.onCancelled();
+        }
+    }
+
+    private String downloadUrl(URL url) throws IOException{
+        InputStream stream = null;
+        HttpURLConnection connection = null;
+        String result = null;
+        try{
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setConnectTimeout(3000);
+            connection.setReadTimeout(3000);
+            connection.setRequestMethod("GET");
+            connection.setDoInput(true);
+            connection.connect();
+            int responseCode = connection.getResponseCode();
+            if(responseCode==HttpURLConnection.HTTP_OK){
+                stream = connection.getInputStream();
+                if(stream!=null){
+                    result = readStream(stream,500);
+                }
+            }else{
+                throw new IOException("HTTP error code: " + responseCode);
+            }
+        }finally {
+            if(connection!=null){
+                connection.disconnect();
+            }
+            if(stream!=null){
+                stream.close();
+            }
+        }
+        return result;
+    }
+
+    private String readStream(InputStream stream, int maxReadSize) throws IOException, UnsupportedEncodingException{
+        Reader reader = new InputStreamReader(stream,"UTF-8");
+        char[] rawBuffer = new char[maxReadSize];
+        int readSize;
+        StringBuilder buffer = new StringBuilder();
+        while((readSize = reader.read(rawBuffer)) != -1 && maxReadSize>0){
+            if (readSize > maxReadSize){
+                readSize = maxReadSize;
+            }
+            buffer.append(rawBuffer, 0, readSize);
+            maxReadSize -= readSize;
+        }
+        return buffer.toString();
+    }
+
+
 }
