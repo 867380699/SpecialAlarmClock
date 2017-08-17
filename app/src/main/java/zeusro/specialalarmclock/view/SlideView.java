@@ -3,6 +3,7 @@ package zeusro.specialalarmclock.view;
 import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -26,6 +27,7 @@ import android.view.animation.Interpolator;
 import zeusro.specialalarmclock.R;
 
 /**
+ * slide to unlock
  * Created by Z on 2015/11/27.
  */
 
@@ -98,27 +100,28 @@ public class SlideView extends View {
         mMaxVelocity = configuration.getScaledMaximumFlingVelocity();
         mInterpolator = new AccelerateDecelerateInterpolator();
         mDensity = getResources().getDisplayMetrics().density;
+        Resources res = getResources();
         setClickable(true);
         setFocusable(true);
         setFocusableInTouchMode(true);
 
         TypedArray typeArray = context.obtainStyledAttributes(attrs, R.styleable.SlideView);
         mText = typeArray.getString(R.styleable.SlideView_maskText);
-        mTextSize = typeArray.getDimensionPixelSize(R.styleable.SlideView_maskTextSize, R.dimen.mask_text_size);
-        mTextLeft = typeArray.getDimensionPixelSize(R.styleable.SlideView_maskTextMarginLeft, R.dimen.mask_text_margin_left);
-        mTextTop = typeArray.getDimensionPixelSize(R.styleable.SlideView_maskTextMarginTop, R.dimen.mask_text_margin_top);
+        mTextSize = typeArray.getDimensionPixelSize(R.styleable.SlideView_maskTextSize, (int) res.getDimension(R.dimen.mask_text_size));
+        mTextLeft = typeArray.getDimensionPixelSize(R.styleable.SlideView_maskTextMarginLeft, (int) res.getDimension(R.dimen.mask_text_margin_left));
+        mTextTop = typeArray.getDimensionPixelSize(R.styleable.SlideView_maskTextMarginTop, (int) res.getDimension(R.dimen.mask_text_margin_top));
 
         mSlider = typeArray.getResourceId(R.styleable.SlideView_slider, R.mipmap.app_icon);
-        mSliderLeft = typeArray.getDimensionPixelSize(R.styleable.SlideView_sliderMarginLeft, R.dimen.slider_margin_left);
-        mSliderTop = typeArray.getDimensionPixelSize(R.styleable.SlideView_sliderMarginTop, R.dimen.slider_margin_top);
+        mSliderLeft = typeArray.getDimensionPixelSize(R.styleable.SlideView_sliderMarginLeft, (int) res.getDimension(R.dimen.slider_margin_left));
+        mSliderTop = typeArray.getDimensionPixelSize(R.styleable.SlideView_sliderMarginTop, (int) res.getDimension(R.dimen.slider_margin_top));
         mSliderBitmap = BitmapFactory.decodeResource(getResources(), mSlider);
         mSliderRect = new Rect(mSliderLeft, mSliderTop, mSliderLeft + mSliderBitmap.getWidth(), mSliderTop + mSliderBitmap.getHeight());
 
-        mSlidableLength = typeArray.getDimensionPixelSize(R.styleable.SlideView_slidableLength, R.dimen.slidable_length);
+        mSlidableLength = typeArray.getDimensionPixelSize(R.styleable.SlideView_slidableLength, (int) res.getDimension(R.dimen.slidable_length));
         mEffectiveLength = typeArray.getDimensionPixelSize(R.styleable.SlideView_effectiveLength,
-                R.dimen.effective_length);
+                (int) res.getDimension(R.dimen.effective_length));
         mEffectiveVelocity = typeArray.getDimensionPixelSize(R.styleable.SlideView_effectiveVelocity,
-                R.dimen.effective_velocity);
+                (int) res.getDimension(R.dimen.effective_velocity));
         typeArray.recycle();
 
         mGradientColors = new int[]{Color.argb(255, 120, 120, 120), Color.argb(255, 120, 120, 120), Color.argb(255, 255, 255, 255)};
