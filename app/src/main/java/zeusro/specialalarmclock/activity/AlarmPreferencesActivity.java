@@ -19,7 +19,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckedTextView;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -39,7 +38,6 @@ public class AlarmPreferencesActivity extends BaseActivity {
     public static final String TAG = "AlarmPreferences";
     private Alarm alarm;
     private MediaPlayer mediaPlayer;
-    private ListView listView;
     private CountDownTimer alarmToneTimer;
     private final String[] repeatDays = {"一", "二", "三", "四", "五", "六", "日"};
     private EditText etTitle;
