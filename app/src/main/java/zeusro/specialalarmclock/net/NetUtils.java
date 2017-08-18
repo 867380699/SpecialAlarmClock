@@ -16,7 +16,7 @@ import java.net.URL;
 
 public class NetUtils {
 
-    public static String downloadUrl(URL url) throws IOException {
+    public static String get(URL url) throws IOException {
         InputStream stream = null;
         HttpURLConnection connection = null;
         String result = null;

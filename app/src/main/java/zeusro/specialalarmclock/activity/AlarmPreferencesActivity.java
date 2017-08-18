@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import zeusro.specialalarmclock.Alarm;
+import zeusro.specialalarmclock.bean.Alarm;
 import zeusro.specialalarmclock.Database;
 import zeusro.specialalarmclock.Key;
 import zeusro.specialalarmclock.R;
@@ -261,7 +261,7 @@ public class AlarmPreferencesActivity extends BaseActivity {
     void initWeekButton(Button button, final int dayOfWeek) {
         final Button week = button;
         if (week != null) {
-            Boolean isRepeat = alarm.IsRepeat(dayOfWeek);
+            Boolean isRepeat = alarm.isRepeat(dayOfWeek);
             if (isRepeat) {
                 week.setTextColor(Color.WHITE);
                 week.setBackgroundColor(Color.GRAY);
@@ -316,7 +316,8 @@ public class AlarmPreferencesActivity extends BaseActivity {
 //        }
         Database.init(getApplicationContext());
         if (alarm.getId() < 1) {
-            Database.create(alarm);
+            long id = Database.create(alarm);
+            alarm.setId(id);
         } else {
             Database.update(alarm);
         }

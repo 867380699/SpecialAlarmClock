@@ -1,18 +1,22 @@
-package zeusro.specialalarmclock;
+package zeusro.specialalarmclock.bean;
 
 import android.media.RingtoneManager;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
+ *
  * Created by Z on 2015/11/16.
  */
 public class Alarm implements Serializable {
 
-    private int id;
+    private long id;
     private Boolean alarmActive = true;
     private Calendar alarmTime = Calendar.getInstance();
     private int[] days = {Calendar.SUNDAY, Calendar.MONDAY, Calendar.TUESDAY, Calendar.WEDNESDAY, Calendar.THURSDAY, Calendar.FRIDAY, Calendar.SATURDAY,};
@@ -77,7 +81,7 @@ public class Alarm implements Serializable {
      * @param dayOfWeek
      * @return
      */
-    public boolean IsRepeat(int dayOfWeek) {
+    public boolean isRepeat(int dayOfWeek) {
         if (days == null || days.length < 1)
             return false;
         for (int i = 0; i < days.length; i++) {
@@ -200,11 +204,11 @@ public class Alarm implements Serializable {
     }
 
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -252,6 +256,19 @@ public class Alarm implements Serializable {
             }
         }
         return sb.toString();
+    }
 
+    @Override
+    public String toString() {
+        SimpleDateFormat simpleDate =  new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return "Alarm{" +
+                "id=" + id +
+                ", alarmActive=" + alarmActive +
+                ", alarmTime=" + simpleDate.format(new Date(alarmTime.getTimeInMillis()))  +
+                ", days=" + Arrays.toString(days) +
+                ", alarmTonePath='" + alarmTonePath + '\'' +
+                ", vibrate=" + vibrate +
+                ", alarmName='" + alarmName + '\'' +
+                '}';
     }
 }

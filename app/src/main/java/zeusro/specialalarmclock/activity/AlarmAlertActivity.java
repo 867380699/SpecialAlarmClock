@@ -1,32 +1,35 @@
 package zeusro.specialalarmclock.activity;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
-import android.view.View;
-import android.widget.Toast;
+import android.widget.TextView;
 
-import zeusro.specialalarmclock.Alarm;
 import zeusro.specialalarmclock.R;
 import zeusro.specialalarmclock.StaticWakeLock;
+import zeusro.specialalarmclock.bean.Alarm;
 import zeusro.specialalarmclock.receiver.AlarmServiceBroadcastReceiver;
 import zeusro.specialalarmclock.view.SlideView;
 
-public class AlarmAlertActivity extends AppCompatActivity implements View.OnClickListener {
+/**
+ * 闹钟唤醒时的页面，滑动关闭闹钟
+ *
+ * @author lls
+ * @since 2017/8/18 下午3:47
+ */
+public class AlarmAlertActivity extends AppCompatActivity{
     private Alarm alarm;
     private MediaPlayer mediaPlayer;
     private Vibrator vibrator;
     private boolean alarmActive;
-
+    private TextView textView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,11 +43,13 @@ public class AlarmAlertActivity extends AppCompatActivity implements View.OnClic
                 startAlarm();
             }
         }
-        SetSlideView();
-        SetTelephonyStateChangedListener();
+        textView = (TextView) findViewById(R.id.textView2);
+        textView.setText(alarm.toString());
+        setSlideView();
+        setTelephonyStateChangedListener();
     }
 
-    private void SetTelephonyStateChangedListener() {
+    private void setTelephonyStateChangedListener() {
         PhoneStateListener phoneStateListener = new PhoneStateListener() {
             @Override
             public void onCallStateChanged(int state, String incomingNumber) {
@@ -73,31 +78,17 @@ public class AlarmAlertActivity extends AppCompatActivity implements View.OnClic
         telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
     }
 
-    private void SetSlideView() {
+    private void setSlideView() {
         SlideView slideView = (SlideView) findViewById(R.id.slider);
         slideView.setSlideListener(new SlideView.SlideListener() {
             @Override
             public void onDone() {
-                AlarmServiceBroadcastReceiver reciever = new AlarmServiceBroadcastReceiver();
-                reciever.CancelAlarm(AlarmAlertActivity.this);
+                AlarmServiceBroadcastReceiver receiver = new AlarmServiceBroadcastReceiver();
+                receiver.cancelAlarm(AlarmAlertActivity.this);
                 ReleaseRelease();
-                Toast.makeText(AlarmAlertActivity.this, "早起啦", Toast.LENGTH_SHORT).show();
-                Log.d("SHIT", String.valueOf(Build.VERSION.SDK_INT));
-                if (Build.VERSION.SDK_INT > 15) {
-                    quit();
-                    return;
-                }
-                int pid = android.os.Process.myPid();
-                android.os.Process.killProcess(pid);
-                System.exit(0);
-
+                finishAffinity();
             }
         });
-    }
-
-    @TargetApi(16)
-    protected void quit() {
-        finishAffinity();
     }
 
     @Override
@@ -107,7 +98,7 @@ public class AlarmAlertActivity extends AppCompatActivity implements View.OnClic
     }
 
     private void startAlarm() {
-        if (alarm.getAlarmTonePath() != "") {
+        if (!"".equals(alarm.getAlarmTonePath())) {
             mediaPlayer = new MediaPlayer();
             if (alarm.IsVibrate()) {
                 vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
@@ -135,15 +126,11 @@ public class AlarmAlertActivity extends AppCompatActivity implements View.OnClic
      */
     @Override
     public void onBackPressed() {
-        if (!alarmActive)
+        if (!alarmActive){
             super.onBackPressed();
+        }
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see android.app.Activity#onPause()
-     */
     @Override
     protected void onPause() {
         super.onPause();
@@ -165,29 +152,18 @@ public class AlarmAlertActivity extends AppCompatActivity implements View.OnClic
             if (vibrator != null)
                 vibrator.cancel();
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
         try {
             mediaPlayer.stop();
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
         try {
             mediaPlayer.release();
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
         super.onDestroy();
-    }
-
-
-    /**
-     * Called when a view has been clicked.
-     *
-     * @param v The view that was clicked.
-     */
-    @Override
-    public void onClick(View v) {
-
     }
 }

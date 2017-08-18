@@ -2,12 +2,9 @@ package zeusro.specialalarmclock.activity;
 
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.HapticFeedbackConstants;
@@ -24,18 +21,17 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import zeusro.specialalarmclock.Alarm;
+import zeusro.specialalarmclock.bean.Alarm;
 import zeusro.specialalarmclock.Database;
 import zeusro.specialalarmclock.R;
 import zeusro.specialalarmclock.adapter.AlarmListAdapter;
-import zeusro.specialalarmclock.net.DownloadCallback;
-import zeusro.specialalarmclock.net.HttpGetAsyncTask;
 import zeusro.specialalarmclock.receiver.NotificationWakeUpReceiver;
+import zeusro.specialalarmclock.repository.HolidayRepository;
 
 /**
  * 主activity
  */
-public class AlarmActivity extends BaseActivity {
+public class AlarmActivity extends BaseActivity implements View.OnClickListener{
 
     AlarmListAdapter alarmListAdapter;
     ListView lvAlarm;
@@ -43,14 +39,14 @@ public class AlarmActivity extends BaseActivity {
     ImageButton btnSetting;
     private boolean isExit;
     public final static int notificationId = 1;
-
+    HolidayRepository repository;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         Toast.makeText(this, R.string.Thank, Toast.LENGTH_SHORT).show();
+        repository = new HolidayRepository(this);
         initView();
-
     }
     private void initView() {
         initAlarmList();
@@ -143,7 +139,7 @@ public class AlarmActivity extends BaseActivity {
                             dialog.dismiss();
                         }
                     });
-                    dialog.setNegativeButton("好", new OnClickListener() {
+                    dialog.setNegativeButton("删除", new OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             Database.init(AlarmActivity.this);
@@ -182,7 +178,18 @@ public class AlarmActivity extends BaseActivity {
                 @Override
                 public void onClick(View v) {
                     CreateNotification(null);
-                    getHoliday();
+                    repository.getHolidayFromRemote("2017", new HolidayRepository.Callback() {
+                        @Override
+                        public void showResult(String result) {
+                            Toast.makeText(AlarmActivity.this,"holiday: "+ result, Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    repository.getSpecialWorkingDayFromRemote("2017", new HolidayRepository.Callback() {
+                        @Override
+                        public void showResult(String result) {
+                            Toast.makeText(AlarmActivity.this,"workingDay: "+result, Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 }
 
             });
@@ -232,22 +239,4 @@ public class AlarmActivity extends BaseActivity {
         intent.setClass(this, NotificationWakeUpReceiver.class);
         sendBroadcast(intent);//发送广播事件
     }
-
-
-    private void getHoliday(){
-        new HttpGetAsyncTask(new DownloadCallback<String>() {
-            @Override
-            public NetworkInfo getActiveNetworkInfo() {
-                ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-                return manager.getActiveNetworkInfo();
-            }
-
-            @Override
-            public void showResult(String result) {
-                Toast.makeText(AlarmActivity.this,result,Toast.LENGTH_SHORT).show();
-            }
-        }).execute("http://tool.bitefu.net/jiari?d=2017");
-    }
-
-
 }

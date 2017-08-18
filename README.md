@@ -55,6 +55,8 @@ http://javatechig.com/android/repeat-alarm-example-in-android
 
 https://developer.android.com/training/basics/network-ops/connecting.html
 
+https://developer.android.com/training/scheduling/alarms.html
+
 ## License
 
     Licensed under the Apache License, Version 2.0 (the "License");

@@ -37,7 +37,7 @@ public class HttpGetAsyncTask extends AsyncTask<String, Void, String> {
             if (!isCancelled()){
                 try {
                     URL url = new URL(params[0]);
-                    String resultString = NetUtils.downloadUrl(url);
+                    String resultString = NetUtils.get(url);
                     if(resultString!=null){
                         return resultString;
                     }else{

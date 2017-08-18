@@ -16,122 +16,104 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import zeusro.specialalarmclock.Alarm;
+import zeusro.specialalarmclock.bean.Alarm;
 import zeusro.specialalarmclock.Database;
 import zeusro.specialalarmclock.service.SchedulingService;
 
 /**
+ * 接收闹钟定时消息的 BroadcastReceiver
  *
+ * @author zeusro
+ * @since 2017/8/18 下午3:01
  */
 public class AlarmServiceBroadcastReceiver extends WakefulBroadcastReceiver {
-
-    Alarm alarm;
-
-    // The app's AlarmManager, which provides access to the system alarm services.
+    private Alarm alarm;
     private AlarmManager alarmMgr;
-    // The pending intent that is triggered when the alarm fires.
     private PendingIntent alarmIntent;
-
 
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.d(this.getClass().getSimpleName(), Thread.currentThread().getStackTrace()[2].getMethodName());
         try {
-            //            11-27 13:43:39.020 14674-14674/zeusro.specialalarmclock D/TEST: null
-//            11-27 13:43:39.020 14674-14674/zeusro.specialalarmclock D/TEST: android.intent.extra.ALARM_COUNT
-//            11-27 13:43:39.020 14674-14674/zeusro.specialalarmclock D/TEST: 1
-//            11-27 13:43:39.020 14674-14674/zeusro.specialalarmclock D/AlarmServiceBroadcastReceiver: false
-//            Log.d("TEST", String.valueOf(intent.getAction()));
-//            Bundle bundle = intent.getExtras();
-
-//            Set<String> keySet = bundle.keySet();
-//            for (String key : keySet) {
-//                Object value = bundle.get(key);
-//                Log.d("TEST", key.toString());
-//                Log.d("TEST", value.toString());
-//            }
-//            Log.d(this.getClass().getSimpleName(), String.valueOf(bundle.getSerializable("alarm") != null));
-//            alarm = (Alarm) bundle.getSerializable("alarm");
-//            if (alarm == null)
-//                throw new Exception("参数没有啊混蛋");
-            //            service.putExtra("alarm", alarm);
-            // FIXME: 2015/11/27 通过对象传递找到对象而不是查数据库
-//            Log.d(this.getClass().getSimpleName(), String.valueOf( intent.getSerializableExtra("alarm") != null));
-//            alarm = (Alarm) intent.getSerializableExtra("alarm");
-            alarm = getNext(context);
-            Intent service = new Intent(context, SchedulingService.class);
-            service.putExtra("alarm", alarm);
-
-
+            long alarmId = intent.getLongExtra("alarm",0);
+            if(alarmId > 0){
+                alarm = Database.getAlarm(alarmId);
+                Intent service = new Intent(context, SchedulingService.class);
+                service.putExtra("alarm", alarm);
+                startWakefulService(context, service);
+                setResultCode(Activity.RESULT_OK);
+            }
             // Start the service, keeping the device awake while it is launching.
-            startWakefulService(context, service);
-            setResultCode(Activity.RESULT_OK);
         } catch (Exception e) {
             Log.wtf("WTF", e);
         }
     }
 
-
     public void setAlarm(Context context, Alarm alarm) {
-        Log.d(this.getClass().getSimpleName(), Thread.currentThread().getStackTrace()[2].getMethodName());
-        Intent intent = new Intent(context, AlarmServiceBroadcastReceiver.class);
-        alarmIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
-        if (alarm == null)
-            alarm = getNext(context);
-        if (alarm == null) {
-            Log.d(context.getPackageName(), "没有闹钟");
-            CancelAlarm(context);
+        if (alarm == null){
             return;
         }
-        intent.setAction("zeusro.action.alert");
-        intent.putExtra("alarm", alarm);
         Calendar calendar = alarm.getAlarmTime();
-        Calendar now = (Calendar) calendar.clone();
-        now.set(Calendar.HOUR_OF_DAY, Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
-        now.set(Calendar.MINUTE, Calendar.getInstance().get(Calendar.MINUTE));
-        now.set(Calendar.SECOND, calendar.get(Calendar.SECOND));
-        if (now.getTimeInMillis() > calendar.getTimeInMillis()) {
-            CancelAlarm(context);
+        if (System.currentTimeMillis() > calendar.getTimeInMillis()) {
+            cancelAlarm(context);
             return;
         }
+        Intent intent = new Intent(context, AlarmServiceBroadcastReceiver.class);
+        intent.setAction("zeusro.action.alert");
+        intent.putExtra("alarm", alarm.getId());
+        System.out.println("set id: " +alarm.getId());
+        alarmIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-//            Log.d(this.getClass().getSimpleName(), calendar.getTime().toString());
-//            alarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(),  AlarmManager.INTERVAL_FIFTEEN_MINUTES, alarmIntent);
         alarmMgr.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), alarmIntent);
-        // Enable {@code SampleBootReceiver} to automatically restart the alarm when the
-        // device is rebooted.
         ComponentName receiver = new ComponentName(context, BootReceiver.class);
         PackageManager pm = context.getPackageManager();
         //可用状态
         pm.setComponentEnabledSetting(receiver, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
     }
 
+    public void setAllAlarm(Context context) {
+        Alarm alarm = getNext(context);
+        if (alarm == null) {
+            Log.d(context.getPackageName(), "没有闹钟");
+            cancelAlarm(context);
+            return;
+        }
+        Calendar calendar = alarm.getAlarmTime();
 
+        if (System.currentTimeMillis() > calendar.getTimeInMillis()) {
+            cancelAlarm(context);
+            return;
+        }
+        Intent intent = new Intent(context, AlarmServiceBroadcastReceiver.class);
+        intent.setAction("zeusro.action.alert");
+        intent.putExtra("alarm", alarm);
+        alarmIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
+        alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        alarmMgr.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), alarmIntent);
+        ComponentName receiver = new ComponentName(context, BootReceiver.class);
+        PackageManager pm = context.getPackageManager();
+        //可用状态
+        pm.setComponentEnabledSetting(receiver, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
+    }
     /**
      * Cancels the alarm.
      *
-     * @param context
+     * @param context context
      */
-    // BEGIN_INCLUDE(cancel_alarm)
-    public void CancelAlarm(Context context) {
-        if (null == alarmIntent) {
+    public void cancelAlarm(Context context) {
+        if (alarmIntent == null) {
             Intent intent = new Intent(context, AlarmServiceBroadcastReceiver.class);
             alarmIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
         }
-        // If the alarm has been set, cancel it.
         if (alarmMgr != null) {
             alarmMgr.cancel(alarmIntent);
         }
-        // Disable {@code SampleBootReceiver} so that it doesn't automatically restart the
-        // alarm when the device is rebooted.
         ComponentName receiver = new ComponentName(context, BootReceiver.class);
         PackageManager pm = context.getPackageManager();
-
         pm.setComponentEnabledSetting(receiver,
                 PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
                 PackageManager.DONT_KILL_APP);
     }
-
 
     private Alarm getNext(Context context) {
         Set<Alarm> alarmQueue = new TreeSet<Alarm>(new Comparator<Alarm>() {

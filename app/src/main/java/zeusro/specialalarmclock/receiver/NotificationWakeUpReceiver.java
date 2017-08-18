@@ -11,8 +11,6 @@ import zeusro.specialalarmclock.R;
 import zeusro.specialalarmclock.activity.AlarmActivity;
 
 public class NotificationWakeUpReceiver extends BroadcastReceiver {
-    public NotificationWakeUpReceiver() {
-    }
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -25,6 +23,5 @@ public class NotificationWakeUpReceiver extends BroadcastReceiver {
         mBuilder.setContentIntent(PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_ONE_SHOT));
         NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.notify(AlarmActivity.notificationId, mBuilder.build());
-
     }
 }

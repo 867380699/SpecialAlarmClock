@@ -10,7 +10,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import zeusro.specialalarmclock.Alarm;
+import zeusro.specialalarmclock.bean.Alarm;
 import zeusro.specialalarmclock.Database;
 import zeusro.specialalarmclock.R;
 import zeusro.specialalarmclock.activity.AlarmActivity;

@@ -15,15 +15,18 @@ import java.io.StreamCorruptedException;
 import java.util.ArrayList;
 import java.util.List;
 
+import zeusro.specialalarmclock.bean.Alarm;
+
 /**
+ *
  * Created by Z on 2015/11/16.
  */
 public class Database extends SQLiteOpenHelper {
-    static Database instance = null;
-    static SQLiteDatabase database = null;
+    private static Database instance = null;
+    private static SQLiteDatabase database = null;
 
-    static final String DATABASE_NAME = "DB";
-    static final int DATABASE_VERSION = 1;
+    private static final String DATABASE_NAME = "DB";
+    private static final int DATABASE_VERSION = 1;
 
     public static final String ALARM_TABLE = "alarm";
     public static final String COLUMN_ALARM_ID = "_id";
@@ -101,11 +104,11 @@ public class Database extends SQLiteOpenHelper {
         return getDatabase().update(ALARM_TABLE, cv, "_id=" + alarm.getId(), null);
     }
 
-    public static int deleteEntry(Alarm alarm) {
+    public static long deleteEntry(Alarm alarm) {
         return deleteEntry(alarm.getId());
     }
 
-    public static int deleteEntry(int id) {
+    public static long deleteEntry(long id) {
         return getDatabase().delete(ALARM_TABLE, COLUMN_ALARM_ID + "=" + id, null);
     }
 
@@ -113,7 +116,7 @@ public class Database extends SQLiteOpenHelper {
         return getDatabase().delete(ALARM_TABLE, "1", null);
     }
 
-    public static Alarm getAlarm(int id) {
+    public static Alarm getAlarm(long id) {
         String[] columns = new String[]{
                 COLUMN_ALARM_ID,
                 COLUMN_ALARM_ACTIVE,
@@ -130,10 +133,10 @@ public class Database extends SQLiteOpenHelper {
         if (c.moveToFirst()) {
 
             alarm = new Alarm();
-            alarm.setId(c.getInt(1));
-            alarm.setAlarmActive(c.getInt(2) == 1);
-            alarm.setAlarmTime(c.getString(3));
-            byte[] repeatDaysBytes = c.getBlob(4);
+            alarm.setId(c.getInt(0));
+            alarm.setAlarmActive(c.getInt(1) == 1);
+            alarm.setAlarmTime(c.getString(2));
+            byte[] repeatDaysBytes = c.getBlob(3);
 
             ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(repeatDaysBytes);
             try {
@@ -152,9 +155,9 @@ public class Database extends SQLiteOpenHelper {
                 e.printStackTrace();
             }
 
-            alarm.setAlarmTonePath(c.getString(6));
-            alarm.setVibrate(c.getInt(7) == 1);
-            alarm.setAlarmName(c.getString(8));
+            alarm.setAlarmTonePath(c.getString(4));
+            alarm.setVibrate(c.getInt(5) == 1);
+            alarm.setAlarmName(c.getString(6));
         }
         c.close();
         return alarm;
@@ -174,7 +177,7 @@ public class Database extends SQLiteOpenHelper {
                 null);
     }
 
-    Database(Context context) {
+    private Database(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 

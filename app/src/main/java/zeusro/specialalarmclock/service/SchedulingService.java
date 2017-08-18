@@ -4,10 +4,16 @@ import android.app.IntentService;
 import android.content.Intent;
 import android.util.Log;
 
-import zeusro.specialalarmclock.Alarm;
+import zeusro.specialalarmclock.bean.Alarm;
 import zeusro.specialalarmclock.activity.AlarmAlertActivity;
 import zeusro.specialalarmclock.receiver.AlarmServiceBroadcastReceiver;
 
+/**
+ *
+ *
+ * @author zeusro
+ * @since 2017/8/18 下午3:47
+ */
 public class SchedulingService extends IntentService {
     public SchedulingService() {
         super("SchedulingService");
