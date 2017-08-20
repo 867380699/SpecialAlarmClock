@@ -24,6 +24,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import zeusro.specialalarmclock.bean.Alarm;
@@ -67,24 +68,42 @@ public class AlarmPreferencesActivity extends BaseActivity {
     }
 
     private void queryRingtoneList() {
-        RingtoneManager ringtoneMgr = new RingtoneManager(this);
-        ringtoneMgr.setType(RingtoneManager.TYPE_ALARM);
-        Cursor alarmsCursor = ringtoneMgr.getCursor();
-        alarmTones = new String[alarmsCursor.getCount() + 1];
-        alarmTonePaths = new String[alarmsCursor.getCount() + 1];
-        alarmTones[0] = "静默模式";
-        alarmTonePaths[0] = "";
-        if (alarmsCursor.moveToFirst()) {
-            do {
-                int position = alarmsCursor.getPosition();
-                //Log.d("ITEM", ringtoneMgr.getRingtone(position).getTitle(this));
-                //Log.d("ITEM", ringtoneMgr.getRingtoneUri(position).toString());
-                alarmTones[alarmsCursor.getPosition() + 1] = ringtoneMgr.getRingtone(position).getTitle(this);
-                alarmTonePaths[alarmsCursor.getPosition() + 1] = ringtoneMgr.getRingtoneUri(position).toString();
-            } while (alarmsCursor.moveToNext());
-        }
-        Log.d(TAG, "Finished Loading " + alarmTones.length + " Ringtones.");
-        alarmsCursor.close();
+        Thread t=new Thread(new Runnable() {
+            @Override
+            public void run() {
+//                Bundle bundle=AlarmPreferencesActivity.this.getIntent().getExtras();
+//                if(bundle!=null){
+//                    alarmTones=(String[])bundle.getSerializable("alarmTones");
+//                    alarmTonePaths=(String[])bundle.getSerializable("alarmTonePaths");
+//                }
+//                if(alarmTones!=null && alarmTonePaths!=null){
+//                    return;
+//                }
+                RingtoneManager ringtoneMgr = new RingtoneManager(AlarmPreferencesActivity.this);
+                ringtoneMgr.setType(RingtoneManager.TYPE_ALARM);
+                Cursor alarmsCursor = ringtoneMgr.getCursor();
+                alarmTones = new String[alarmsCursor.getCount() + 1];
+                alarmTonePaths = new String[alarmsCursor.getCount() + 1];
+                alarmTones[0] = "静默模式";
+                alarmTonePaths[0] = "";
+                if (alarmsCursor.moveToFirst()) {
+                    do {
+                        int position = alarmsCursor.getPosition();
+                        //Log.d("ITEM", ringtoneMgr.getRingtone(position).getTitle(this));
+                        //Log.d("ITEM", ringtoneMgr.getRingtoneUri(position).toString());
+                        alarmTones[alarmsCursor.getPosition() + 1] = ringtoneMgr.getRingtone(position).getTitle(AlarmPreferencesActivity.this);
+                        alarmTonePaths[alarmsCursor.getPosition() + 1] = ringtoneMgr.getRingtoneUri(position).toString();
+                    } while (alarmsCursor.moveToNext());
+                }
+//                AlarmPreferencesActivity.this.getIntent().putExtra("alarmTones",alarmTones);
+//                AlarmPreferencesActivity.this.getIntent().putExtra("alarmTonePaths",alarmTonePaths);
+                Log.d(TAG, "Finished Loading " + alarmTones.length + " Ringtones.");
+                alarmsCursor.close();
+            }
+        });
+        t.start();
+
+
     }
 
     private void initRingtoneSelector() {

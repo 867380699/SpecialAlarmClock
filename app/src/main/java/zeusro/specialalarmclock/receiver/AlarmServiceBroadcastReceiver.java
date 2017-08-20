@@ -37,6 +37,7 @@ public class AlarmServiceBroadcastReceiver extends WakefulBroadcastReceiver {
         try {
             long alarmId = intent.getLongExtra("alarm",0);
             if(alarmId > 0){
+                Database.init(context);
                 alarm = Database.getAlarm(alarmId);
                 Intent service = new Intent(context, SchedulingService.class);
                 service.putExtra("alarm", alarm);
