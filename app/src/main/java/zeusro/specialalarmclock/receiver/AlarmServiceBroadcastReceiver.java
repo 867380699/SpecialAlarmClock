@@ -49,10 +49,19 @@ public class AlarmServiceBroadcastReceiver extends WakefulBroadcastReceiver {
                         showAlarm(context, alarm);
                         break;
                     case Alarm.TYPE_ALARM_WORKDAY:
+                        if (isWorkday(alarm)){
+                            showAlarm(context, alarm);
+                        }
                         break;
                     case Alarm.TYPE_ALARM_HOLIDAY:
+                        if(isHoliday(alarm)){
+                            showAlarm(context, alarm);
+                        }
                         break;
                     case Alarm.TYPE_ALARM_MON_TO_FRI:
+                        if(isCommonWorkday(alarm)){
+                            showAlarm(context, alarm);
+                        }
                         break;
                     case Alarm.TYPE_ALARM_CUSTOM:
                         break;
@@ -66,6 +75,8 @@ public class AlarmServiceBroadcastReceiver extends WakefulBroadcastReceiver {
         }
     }
 
+
+
     private void showAlarm(Context context, Alarm alarm) {
         Intent service = new Intent(context, SchedulingService.class);
         service.putExtra("alarm", alarm);
@@ -73,19 +84,25 @@ public class AlarmServiceBroadcastReceiver extends WakefulBroadcastReceiver {
         setResultCode(Activity.RESULT_OK);
     }
 
+
+    private boolean isCommonWorkday(Alarm alarm) {
+        int todayInWeek = Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
+        return !(todayInWeek == Calendar.SATURDAY || todayInWeek == Calendar.SUNDAY);
+    }
+
     private boolean isWorkday(Alarm alarm) {
         HolidayRepository repository = new HolidayRepository();
-        ArrayList<String> specialWorkdays = repository.getSpecialWorkday();
         Date current = Calendar.getInstance().getTime();
         String today = new SimpleDateFormat("MMdd", Locale.CHINA).format(current);
         // 特殊工作日一定是工作日
+        ArrayList<String> specialWorkdays = repository.loadSpecialWorkingDayFromLocal();
         for (String workday : specialWorkdays) {
             if (workday.equals(today)) {
                 return true;
             }
         }
         // 法定假日一定不是工作日
-        ArrayList<String> holidays = repository.getHoliday();
+        ArrayList<String> holidays = repository.loadHolidayFromLocal();
         for (String holiday : holidays) {
             if(holiday.equals(today)){
                 return false;
@@ -94,6 +111,29 @@ public class AlarmServiceBroadcastReceiver extends WakefulBroadcastReceiver {
         // 其他
         int todayInWeek = Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
         return !(todayInWeek == Calendar.SATURDAY || todayInWeek == Calendar.SUNDAY);
+    }
+
+    private boolean isHoliday(Alarm alarm){
+        HolidayRepository repository = new HolidayRepository();
+        Date current = Calendar.getInstance().getTime();
+        String today = new SimpleDateFormat("MMdd", Locale.CHINA).format(current);
+        // 法定节假日一定是假日
+        ArrayList<String> holidays = repository.loadHolidayFromLocal();
+        for (String holiday : holidays) {
+            if(holiday.equals(today)){
+                return true;
+            }
+        }
+        // 特殊工作日一定不是假日
+        ArrayList<String> specialWorkdays = repository.loadSpecialWorkingDayFromLocal();
+        for (String workday : specialWorkdays) {
+            if (workday.equals(today)) {
+                return false;
+            }
+        }
+        // 其他
+        int todayInWeek = Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
+        return (todayInWeek == Calendar.SATURDAY || todayInWeek == Calendar.SUNDAY);
     }
 
     public void setAlarm(Context context, Alarm alarm) {

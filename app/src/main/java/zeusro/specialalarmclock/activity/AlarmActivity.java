@@ -17,6 +17,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -27,6 +28,7 @@ import zeusro.specialalarmclock.R;
 import zeusro.specialalarmclock.adapter.AlarmListAdapter;
 import zeusro.specialalarmclock.receiver.NotificationWakeUpReceiver;
 import zeusro.specialalarmclock.repository.HolidayRepository;
+import zeusro.specialalarmclock.utils.ToastUtils;
 
 /**
  * 主activity
@@ -99,7 +101,7 @@ public class AlarmActivity extends BaseActivity implements View.OnClickListener{
             Database.update(alarm);
             AlarmActivity.this.callAlarmServiceBroadcastReceiver(alarm);
             if (checkBox.isChecked()) {
-                Toast.makeText(AlarmActivity.this, alarm.getTimeUntilNextAlarmMessage(), Toast.LENGTH_LONG).show();
+                ToastUtils.show(alarm.getTimeUntilNextAlarmMessage());
             }
         }
     }
@@ -180,23 +182,23 @@ public class AlarmActivity extends BaseActivity implements View.OnClickListener{
                     CreateNotification(null);
                     repository.getHolidayFromRemote("2017", new HolidayRepository.Callback() {
                         @Override
-                        public void onDataLoaded(String result) {
+                        public void onDataLoaded(ArrayList<String> result) {
                             Toast.makeText(AlarmActivity.this,"holiday: "+ result, Toast.LENGTH_SHORT).show();
                         }
 
                         @Override
-                        public void nDataNotAvailable(String result) {
+                        public void onDataNotAvailable(String result) {
 
                         }
                     });
                     repository.getSpecialWorkingDayFromRemote("2017", new HolidayRepository.Callback() {
                         @Override
-                        public void onDataLoaded(String result) {
-                            Toast.makeText(AlarmActivity.this,"workingDay: "+result, Toast.LENGTH_SHORT).show();
+                        public void onDataLoaded(ArrayList<String> result) {
+                            Toast.makeText(AlarmActivity.this,"workingDay: "+ result, Toast.LENGTH_SHORT).show();
                         }
 
                         @Override
-                        public void nDataNotAvailable(String result) {
+                        public void onDataNotAvailable(String result) {
 
                         }
                     });

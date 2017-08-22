@@ -6,10 +6,10 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
 import android.support.v4.util.ArraySet;
-import android.text.TextUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Set;
 
 import zeusro.specialalarmclock.application.BaseApplication;
@@ -18,6 +18,8 @@ import zeusro.specialalarmclock.net.HttpGetAsyncTask;
 import zeusro.specialalarmclock.utils.DateTimeUtils;
 
 /**
+ * 假期和工作日数据的DAO
+ * TODO: 回调很多，显得过于复杂了，待改进
  * @author lls
  * @since 2017/8/18 上午9:05
  */
@@ -33,8 +35,12 @@ public class HolidayRepository {
     private static final String SP_KEY_WORKING_DAY_UPDATE_TIME = "holiday_list_update_time";
     private Context context;
 
+    public interface Callback {
+        void onDataLoaded(ArrayList<String> result);
+        void onDataNotAvailable(String result);
+    }
+
     /**
-     * TODO: 去除Context
      *
      * @param context context
      */
@@ -44,8 +50,9 @@ public class HolidayRepository {
     public HolidayRepository(){
         this.context = BaseApplication.getInstance().getApplicationContext();
     }
+
     /**
-     * 从服务器获取某年的法定假日
+     * 从服务器获取某年的法定假日, 并缓存到本地
      *
      * @param year 年份
      */
@@ -60,17 +67,17 @@ public class HolidayRepository {
             @Override
             public void showResult(String result) {
                 if (result != null) {
-                    saveHoliday(result);
+                    saveHolidayToLocal(result);
                 }
                 if(callback!=null){
-                    callback.onDataLoaded(TextUtils.join(",", loadHolidayFromLocal()));
+                    callback.onDataLoaded(loadHolidayFromLocal());
                 }
             }
         }).execute(String.format(GET_HOLIDAY, year));
     }
 
     /**
-     * 获取某年的特殊工作日
+     * 从服务器获取某年的特殊工作日, 并缓存到本地
      *
      * @param year 年份
      */
@@ -85,22 +92,21 @@ public class HolidayRepository {
             @Override
             public void showResult(String result) {
                 if (result != null) {
-                    saveSpecialWorkingDay(result);
+                    saveSpecialWorkingDayToLocal(result);
+                    callback.onDataLoaded(loadSpecialWorkingDayFromLocal());
+                }else{
+                    callback.onDataNotAvailable("");
                 }
-                callback.onDataLoaded(TextUtils.join(",", loadSpecialWorkingDayFromLocal()));
             }
         }).execute(String.format(GET_SPECIAL_WORKING_DAY, year));
     }
 
-    public interface Callback {
-        void onDataLoaded(String result);
-        void nDataNotAvailable(String result);
-    }
-
-
-    private void saveHoliday(String holidays){
+    /**
+     * 将从服务器获取来的数据处理后存储至本地
+     * @param holidays 服务器返回的txt数据
+     */
+    private void saveHolidayToLocal(String holidays){
         String[] lines = holidays.split("\n");
-        System.out.println(Arrays.asList(lines));
         ArraySet<String> holidayList = new ArraySet<>();
         for (String line : lines) {
             String line_trim = line.trim();
@@ -108,7 +114,6 @@ public class HolidayRepository {
                 holidayList.add(line_trim);
             }
         }
-        System.out.println(holidayList);
         SharedPreferences pref = context.getSharedPreferences(SP_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = pref.edit();
         editor.putStringSet(SP_KEY_HOLIDAY, new ArraySet<>(holidayList));
@@ -116,7 +121,8 @@ public class HolidayRepository {
         editor.apply();
     }
 
-    private ArrayList<String> loadHolidayFromLocal(){
+
+    public ArrayList<String> loadHolidayFromLocal(){
         SharedPreferences pref = context.getSharedPreferences(SP_NAME, Context.MODE_PRIVATE);
         Set<String> holidaySet = pref.getStringSet(SP_KEY_HOLIDAY,null);
         if(holidaySet!=null){
@@ -125,8 +131,12 @@ public class HolidayRepository {
         return null;
     }
 
-    private void saveSpecialWorkingDay(String workingDays){
-        String[] lines = workingDays.split("\n");
+    /**
+     * 将从服务器获取来的数据处理后存储至本地
+     * @param workdays 服务器返回的txt数据
+     */
+    private void saveSpecialWorkingDayToLocal(String workdays){
+        String[] lines = workdays.split("\n");
         System.out.println(Arrays.asList(lines));
         ArraySet<String> holidayList = new ArraySet<>();
         for (String line : lines) {
@@ -143,7 +153,7 @@ public class HolidayRepository {
         editor.apply();
     }
 
-    private ArrayList<String> loadSpecialWorkingDayFromLocal(){
+    public ArrayList<String> loadSpecialWorkingDayFromLocal(){
         SharedPreferences pref = context.getSharedPreferences(SP_NAME, Context.MODE_PRIVATE);
         Set<String> holidaySet = pref.getStringSet(SP_KEY_WORKING_DAY,null);
         if(holidaySet!=null){
@@ -152,21 +162,51 @@ public class HolidayRepository {
         return null;
     }
 
-    public ArrayList<String> getSpecialWorkday(){
+    /**
+     * 先从本地获取数据，失败则从服务器获取
+     * @param callback callback
+     */
+    public void getSpecialWorkday(final Callback callback){
         SharedPreferences pref = context.getSharedPreferences(SP_NAME, Context.MODE_PRIVATE);
         long saveTime = pref.getLong(SP_KEY_WORKING_DAY_UPDATE_TIME,0);
         if(System.currentTimeMillis()-saveTime< DateTimeUtils.DAY_IN_MILISECOND){
             Set<String> workdaySet =  pref.getStringSet(SP_KEY_WORKING_DAY,null);
             if(workdaySet!=null){
-                return new ArrayList<>(workdaySet);
+                callback.onDataLoaded(new ArrayList<>(workdaySet));
             }else{
-                return null;
+                String year = Integer.toString(Calendar.getInstance().get(Calendar.YEAR));
+                getSpecialWorkingDayFromRemote(year, new Callback() {
+                    @Override
+                    public void onDataLoaded(ArrayList<String> result) {
+                        callback.onDataLoaded(result);
+                    }
+
+                    @Override
+                    public void onDataNotAvailable(String result) {
+                        callback.onDataNotAvailable(result);
+                    }
+                });
             }
         }else{
-            return null;
+            String year = Integer.toString(Calendar.getInstance().get(Calendar.YEAR));
+            getSpecialWorkingDayFromRemote(year, new Callback() {
+                @Override
+                public void onDataLoaded(ArrayList<String> result) {
+                    callback.onDataLoaded(result);
+                }
+
+                @Override
+                public void onDataNotAvailable(String result) {
+                    callback.onDataNotAvailable(result);
+                }
+            });
         }
     }
+
+
     public ArrayList<String> getHoliday(){
         return null;
     }
+
+
 }
