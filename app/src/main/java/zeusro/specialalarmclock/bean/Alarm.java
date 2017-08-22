@@ -11,91 +11,56 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * 闹钟实体
  *
  * Created by Z on 2015/11/16.
  */
 public class Alarm implements Serializable {
+    /** 只响一次 */
+    public static final int TYPE_ALARM_ONCE = 0;
+    public static final int TYPE_EVERYDAY = 1;
+    /** 法定工作日（智能跳过节假日） */
+    public static final int TYPE_ALARM_WORKDAY = 2;
+    /** 法定节假日（智能跳过工作日） */
+    public static final int TYPE_ALARM_HOLIDAY = 3;
+    /** 周一到周五 */
+    public static final int TYPE_ALARM_MON_TO_FRI = 4;
+    /** 自定义 */
+    public static final int TYPE_ALARM_CUSTOM = 5;
 
     private long id;
-    private Boolean alarmActive = true;
+    private Boolean isActive = true;
     private Calendar alarmTime = Calendar.getInstance();
+    /**
+     * <p>{@link Alarm#TYPE_ALARM_ONCE}</p>
+     * <p>{@link Alarm#TYPE_EVERYDAY}</p>
+     * <p>{@link Alarm#TYPE_ALARM_WORKDAY}</p>
+     * <p>{@link Alarm#TYPE_ALARM_HOLIDAY}</p>
+     * <p>{@link Alarm#TYPE_ALARM_MON_TO_FRI}</p>
+     * <p>{@link Alarm#TYPE_ALARM_CUSTOM}</p>
+     * */
+    private int repeatType;
     private int[] days = {Calendar.SUNDAY, Calendar.MONDAY, Calendar.TUESDAY, Calendar.WEDNESDAY, Calendar.THURSDAY, Calendar.FRIDAY, Calendar.SATURDAY,};
     private String alarmTonePath = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM).toString();
     private Boolean vibrate = true;
     private String alarmName = "极简闹钟";
 
-    public Alarm() {
-
+    public Boolean isActive() {
+        return isActive;
     }
 
-
-    public void addDay(int day) {
-        boolean contains = false;
-        int[] temp = getDays();
-        for (int d : temp)
-            if (d == day)
-                contains = true;
-        if (!contains) {
-            int[] result = new int[temp.length + 1];
-            for (int i = 0; i < temp.length; i++) {
-                result[i] = temp[i];
-            }
-            result[temp.length] = day;
-            setDays(result);
-        }
+    public Alarm setActive(Boolean active) {
+        isActive = active;
+        return this;
     }
 
-    public void removeDay(int day) {
-        boolean contains = false;
-        int[] temp = getDays();
-        int[] result = new int[temp.length];
-        int xiabiao = temp.length;
-        for (int i = 0; i < temp.length; i++) {
-            if (temp[i] == day) {
-                contains = true;
-                result = new int[temp.length - 1];
-                xiabiao = i;
-            }
-        }
-        if (contains) {
-            for (int i = 0; i < xiabiao; i++) {
-                result[i] = temp[i];
-            }
-            for (int i = xiabiao + 1; i < temp.length; i++) {
-                result[i - 1] = temp[i];
-            }
-            setDays(result);
-        }
+    public int getRepeatType() {
+        return repeatType;
     }
 
-    /**
-     * @return the alarmActive
-     */
-    public Boolean IsAlarmActive() {
-        return alarmActive;
-    }
-
-    /**
-     * 这一天是否重复
-     *
-     * @param dayOfWeek
-     * @return
-     */
-    public boolean isRepeat(int dayOfWeek) {
-        if (days == null || days.length < 1)
-            return false;
-        for (int i = 0; i < days.length; i++) {
-            if (days[i] == dayOfWeek)
-                return true;
-        }
-        return false;
-    }
-
-    /**
-     * @param alarmActive the alarmActive to set
-     */
-    public void setAlarmActive(Boolean alarmActive) {
-        this.alarmActive = alarmActive;
+    public Alarm setRepeatType(int repeatType) {
+        this.repeatType = repeatType;
+        return this;
     }
 
     /**
@@ -258,17 +223,42 @@ public class Alarm implements Serializable {
         return sb.toString();
     }
 
+
     @Override
     public String toString() {
         SimpleDateFormat simpleDate =  new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return "Alarm{" +
                 "id=" + id +
-                ", alarmActive=" + alarmActive +
-                ", alarmTime=" + simpleDate.format(new Date(alarmTime.getTimeInMillis()))  +
+                ", isActive=" + isActive +
+                ", alarmTime=" + simpleDate.format(new Date(alarmTime.getTimeInMillis())) +
+                ", repeatType=" + repeatType +
                 ", days=" + Arrays.toString(days) +
                 ", alarmTonePath='" + alarmTonePath + '\'' +
                 ", vibrate=" + vibrate +
                 ", alarmName='" + alarmName + '\'' +
                 '}';
+    }
+
+    public static String[] getRepeatTypeArray(){
+        return new String[]{"只响一次","每天","法定工作日（智能跳过节假日）","法定节假日（只能跳过工作日）","周一到周五","自定义"};
+    }
+
+    public static String getRepeatTypeString(int repeatType){
+        switch (repeatType){
+            case TYPE_ALARM_ONCE:
+                return "只响一次";
+            case TYPE_EVERYDAY:
+                return "每天";
+            case TYPE_ALARM_WORKDAY:
+                return "法定工作日（智能跳过节假日）";
+            case TYPE_ALARM_HOLIDAY:
+                return "法定节假日（智能跳过工作日）";
+            case TYPE_ALARM_MON_TO_FRI:
+                return "周一到周五";
+            case TYPE_ALARM_CUSTOM:
+                return "自定义";
+            default:
+                return "";
+        }
     }
 }

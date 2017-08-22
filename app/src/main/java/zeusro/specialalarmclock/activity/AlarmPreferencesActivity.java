@@ -3,7 +3,6 @@ package zeusro.specialalarmclock.activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.Ringtone;
@@ -15,25 +14,19 @@ import android.os.Vibrator;
 import android.text.Editable;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.CheckedTextView;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
-import android.widget.Toast;
 
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
 
-import zeusro.specialalarmclock.bean.Alarm;
 import zeusro.specialalarmclock.Database;
-import zeusro.specialalarmclock.Key;
 import zeusro.specialalarmclock.R;
-import zeusro.specialalarmclock.Type;
-import zeusro.specialalarmclock.bean.AlarmBean;
+import zeusro.specialalarmclock.bean.Alarm;
 import zeusro.specialalarmclock.utils.TextWatcherAdapter;
+import zeusro.specialalarmclock.utils.ToastUtils;
 
 public class AlarmPreferencesActivity extends BaseActivity {
     public static final String TAG = "AlarmPreferences";
@@ -41,10 +34,7 @@ public class AlarmPreferencesActivity extends BaseActivity {
     private Alarm alarm;
     private MediaPlayer mediaPlayer;
     private CountDownTimer alarmToneTimer;
-    private final String[] repeatDays = {"一", "二", "三", "四", "五", "六", "日"};
-    private EditText etTitle;
     private TimePicker timePicker;
-    private List<AlarmBean> alarmList = new ArrayList<>();
     private String[] alarmTones;
     private String[] alarmTonePaths;
 
@@ -57,15 +47,16 @@ public class AlarmPreferencesActivity extends BaseActivity {
             alarm = ((Alarm) bundle.getSerializable(KEY_ALARM));
         } else {
             alarm = new Alarm();
+            alarm.getAlarmTime().set(Calendar.MINUTE,Calendar.getInstance().get(Calendar.MINUTE) + 1);
         }
         queryRingtoneList();
         setMathAlarm(alarm);
         initTitleEditor();
         initTimePicker();
-        initAllWeekButtons();
+        initRepeatButton();
         initCheckedTextView();
-        initRingtoneSelector();
     }
+
 
     private void queryRingtoneList() {
         Thread t=new Thread(new Runnable() {
@@ -84,7 +75,7 @@ public class AlarmPreferencesActivity extends BaseActivity {
                 Cursor alarmsCursor = ringtoneMgr.getCursor();
                 alarmTones = new String[alarmsCursor.getCount() + 1];
                 alarmTonePaths = new String[alarmsCursor.getCount() + 1];
-                alarmTones[0] = "静默模式";
+                alarmTones[0] = "无";
                 alarmTonePaths[0] = "";
                 if (alarmsCursor.moveToFirst()) {
                     do {
@@ -99,6 +90,12 @@ public class AlarmPreferencesActivity extends BaseActivity {
 //                AlarmPreferencesActivity.this.getIntent().putExtra("alarmTonePaths",alarmTonePaths);
                 Log.d(TAG, "Finished Loading " + alarmTones.length + " Ringtones.");
                 alarmsCursor.close();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        initRingtoneSelector();
+                    }
+                });
             }
         });
         t.start();
@@ -109,20 +106,26 @@ public class AlarmPreferencesActivity extends BaseActivity {
     private void initRingtoneSelector() {
         TextView text1 = (TextView) findViewById(R.id.tv_ring_title);
         text1.setTextSize(18);
-        text1.setText(alarmList.get(3).getTitle());
+        text1.setText("铃声");
 
         TextView text2 = (TextView) findViewById(R.id.tv_ring_subtitle);
-        text2.setText(alarmList.get(3).getSummary());
+
+        Uri alarmToneUri = Uri.parse(alarm.getAlarmTonePath());
+        Ringtone alarmTone = RingtoneManager.getRingtone(this, alarmToneUri);
+
+        text2.setText(alarmTones[0]);
 
         findViewById(R.id.ll_ring).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 AlertDialog.Builder alert;
                 alert = new AlertDialog.Builder(AlarmPreferencesActivity.this);
-                alert.setTitle(alarmList.get(3).getTitle());
-                CharSequence[] items = new CharSequence[alarmList.get(3).getOptions().length];
-                for (int i = 0; i < items.length; i++)
-                    items[i] = alarmList.get(3).getOptions()[i];
+                alert.setTitle("铃声");
+                CharSequence[] items = new CharSequence[alarmTones.length];
+                for (int i = 0; i < items.length; i++){
+                    items[i] = alarmTones[i];
+
+                }
                 alert.setItems(items, new DialogInterface.OnClickListener() {
 
                     @Override
@@ -186,52 +189,60 @@ public class AlarmPreferencesActivity extends BaseActivity {
 
     private void initCheckedTextView() {
         CheckedTextView checkedTextView = (CheckedTextView) findViewById(android.R.id.text1);
-        checkedTextView.setText(alarmList.get(4).getTitle());
-        checkedTextView.setChecked((Boolean) (alarmList.get(4).getValue()));
+        checkedTextView.setText("振动");
+        checkedTextView.setChecked(alarm.IsVibrate());
         checkedTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 boolean checked = !((CheckedTextView)v).isChecked();
                 ((CheckedTextView) v).setChecked(checked);
-                switch (alarmList.get(4).getKey()) {
-                    case ALARM_VIBRATE:
-                        alarm.setVibrate(checked);
-                        if (checked) {
-                            Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-                            vibrator.vibrate(1000);
-                        }
-                        break;
+                alarm.setVibrate(checked);
+                if (checked) {
+                    Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+                    vibrator.vibrate(1000);
                 }
-                alarmList.get(4).setValue(checked);
             }
         });
     }
 
-    private void initAllWeekButtons() {
-        initWeekButton((Button) findViewById(R.id.btn_Sunday), Calendar.SUNDAY);
-        initWeekButton((Button) findViewById(R.id.btn_Monday), Calendar.MONDAY);
-        initWeekButton((Button) findViewById(R.id.btn_Tuesday), Calendar.TUESDAY);
-        initWeekButton((Button) findViewById(R.id.btn_Webnesday), Calendar.WEDNESDAY);
-        initWeekButton((Button) findViewById(R.id.btn_Thursday), Calendar.THURSDAY);
-        initWeekButton((Button) findViewById(R.id.btn_Friday), Calendar.FRIDAY);
-        initWeekButton((Button) findViewById(R.id.btn_Saturday), Calendar.SATURDAY);
+    private void initRepeatButton() {
+        final TextView tvRepeat = (TextView) findViewById(R.id.tv_repeat);
+        tvRepeat.setText(Alarm.getRepeatTypeString(alarm.getRepeatType()));
+        LinearLayout llRepeat = (LinearLayout) findViewById(R.id.ll_repeat);
+        llRepeat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(AlarmPreferencesActivity.this);
+                builder.setItems(Alarm.getRepeatTypeArray(), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        alarm.setRepeatType(which);
+                        tvRepeat.setText(Alarm.getRepeatTypeString(alarm.getRepeatType()));
+                        Log.d(TAG,Alarm.getRepeatTypeString(which));
+                        if(which==Alarm.TYPE_ALARM_CUSTOM){
+                            //TODO: 完成自定义功能
+                            Log.d(TAG,"custom click");
+                        }
+                    }
+                });
+                builder.setView(null);
+                builder.create().show();
+            }
+        });
     }
+
 
     private void initTimePicker() {
         timePicker = (TimePicker) findViewById(R.id.timePicker);
         int oldHour = alarm.getAlarmTime().get(Calendar.HOUR_OF_DAY);
         int oldMinute = alarm.getAlarmTime().get(Calendar.MINUTE);
+        timePicker.setCurrentHour(oldHour);
+        timePicker.setCurrentMinute(oldMinute);
 
-        //// FIXME: 2015/11/25 正式环境改回去
-//                timePicker.setCurrentHour(oldHour);
-//                timePicker.setCurrentMinute(oldMinute);
         final Calendar newAlarmTime = Calendar.getInstance();
-        //comment
-        timePicker.setCurrentHour(Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
-        timePicker.setCurrentMinute(Calendar.getInstance().get(Calendar.MINUTE) + 1);
-        newAlarmTime.set(Calendar.HOUR_OF_DAY, Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
-        newAlarmTime.set(Calendar.MINUTE, Calendar.getInstance().get(Calendar.MINUTE) + 1);
-        alarm.setAlarmTime(newAlarmTime);
+//        newAlarmTime.set(Calendar.HOUR_OF_DAY, Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
+//        newAlarmTime.set(Calendar.MINUTE, Calendar.getInstance().get(Calendar.MINUTE) + 1);
+//        alarm.setAlarmTime(newAlarmTime);
 
         if (timePicker != null) {
             timePicker.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
@@ -249,7 +260,7 @@ public class AlarmPreferencesActivity extends BaseActivity {
     }
 
     private void initTitleEditor() {
-        etTitle = (EditText) findViewById(R.id.tagText);
+        EditText etTitle = (EditText) findViewById(R.id.tagText);
         etTitle.setText(alarm.getAlarmName());
         etTitle.addTextChangedListener(new TextWatcherAdapter() {
             @Override
@@ -261,78 +272,12 @@ public class AlarmPreferencesActivity extends BaseActivity {
 
     public void setMathAlarm(Alarm alarm) {
         this.alarm = alarm;
-        alarmList.clear();
-        alarmList.add(new AlarmBean(Key.ALARM_NAME, "标签", alarm.getAlarmName(), null, alarm.getAlarmName(), Type.EditText));
-        alarmList.add(new AlarmBean(Key.ALARM_TIME, "时间", alarm.getAlarmTimeString(), null, alarm.getAlarmTime(), Type.TIME));
-        alarmList.add(new AlarmBean(Key.ALARM_REPEAT, "重复", "重复", repeatDays, alarm.getDays(), Type.MULTIPLE_ImageButton));
-
-        Uri alarmToneUri = Uri.parse(alarm.getAlarmTonePath());
-        Ringtone alarmTone = RingtoneManager.getRingtone(this, alarmToneUri);
-
-        if (!alarm.getAlarmTonePath().equalsIgnoreCase("")) {
-            alarmList.add(new AlarmBean(Key.ALARM_TONE, "铃声", alarmTone.getTitle(this), alarmTones, alarm.getAlarmTonePath(), Type.Ring));
-        } else {
-            alarmList.add(new AlarmBean(Key.ALARM_TONE, "铃声", alarmTones[0], alarmTones, null, Type.Ring));
-        }
-        alarmList.add(new AlarmBean(Key.ALARM_VIBRATE, "振动", null, null, alarm.IsVibrate(), Type.BOOLEAN));
     }
 
-    void initWeekButton(Button button, final int dayOfWeek) {
-        final Button week = button;
-        if (week != null) {
-            Boolean isRepeat = alarm.isRepeat(dayOfWeek);
-            if (isRepeat) {
-                week.setTextColor(Color.WHITE);
-                week.setBackgroundColor(Color.GRAY);
-            } else {
-                week.setTextColor(Color.BLACK);
-                week.setBackgroundColor(Color.WHITE);
-            }
-            week.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int oldButtonTextColor = week.getCurrentTextColor();
-                    //0 白色
-                    if (oldButtonTextColor != -1) {  // 当前文本颜色为黑/-1
-                        week.setTextColor(Color.WHITE);
-                        week.setBackgroundColor(Color.GRAY);
-                        //选中
-                        if (alarm != null)
-                            alarm.addDay(dayOfWeek);
-                        Log.d("data", String.valueOf(dayOfWeek));
 
-                    } else {
-                        int[] days = alarm.getDays();
-                        //至少选择一项才允许取消
-                        if (days != null && days.length > 0) {
-                            week.setTextColor(Color.BLACK);
-                            week.setBackgroundColor(Color.WHITE);
-                            //为取消
-                            if (alarm != null)
-                                alarm.removeDay(dayOfWeek);
-                        }
-
-                    }
-                }
-            });
-        }
-    }
 
     @Override
     public void onBackPressed() {
-//        String data = "data";
-//        Log.d(data, alarm.getAlarmName());
-//        Log.d(data, alarm.getAlarmTime().toString());
-//        Log.d(data, String.valueOf(alarm.getDays().length));
-//        Log.d(data, alarm.getAlarmTonePath());
-//        Log.d(data, String.valueOf(alarm.getVibrate()));
-
-
-//保存闹钟信息
-//        int[] days = alarm.getDays();
-//        if (days == null || days.length < 1) {
-//            //todo: 当任何一天都不重复时,只提醒一次
-//        }
         Database.init(getApplicationContext());
         if (alarm.getId() < 1) {
             long id = Database.create(alarm);
@@ -341,14 +286,14 @@ public class AlarmPreferencesActivity extends BaseActivity {
             Database.update(alarm);
         }
         callAlarmServiceBroadcastReceiver(alarm);
-        Toast.makeText(AlarmPreferencesActivity.this, alarm.getTimeUntilNextAlarmMessage(), Toast.LENGTH_LONG).show();
+        ToastUtils.show(alarm.getTimeUntilNextAlarmMessage());
         //跨activity传值,用于测试
 //        Intent resultIntent = new Intent();
 //        Bundle bundle = new Bundle();
 //        bundle.putSerializable("object", alarm);
 //        resultIntent.putExtras(bundle);
 //        setResult(RESULT_OK, resultIntent);
-        ReleaseMusicPlayer();
+        releaseMusicPlayer();
         super.onBackPressed();
         finish();
     }
@@ -362,16 +307,17 @@ public class AlarmPreferencesActivity extends BaseActivity {
     protected void onPause() {
         super.onPause();
         try {
-            ReleaseMusicPlayer();
+            releaseMusicPlayer();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private void ReleaseMusicPlayer() {
-        if (mediaPlayer != null)
+    private void releaseMusicPlayer() {
+        if (mediaPlayer != null){
             mediaPlayer.release();
-        mediaPlayer = null;
+            mediaPlayer = null;
+        }
     }
 }
 

@@ -12,8 +12,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Set;
 
+import zeusro.specialalarmclock.application.BaseApplication;
 import zeusro.specialalarmclock.net.DownloadCallback;
 import zeusro.specialalarmclock.net.HttpGetAsyncTask;
+import zeusro.specialalarmclock.utils.DateTimeUtils;
 
 /**
  * @author lls
@@ -39,7 +41,9 @@ public class HolidayRepository {
     public HolidayRepository(@NonNull Context context) {
         this.context = context;
     }
-
+    public HolidayRepository(){
+        this.context = BaseApplication.getInstance().getApplicationContext();
+    }
     /**
      * 从服务器获取某年的法定假日
      *
@@ -58,7 +62,9 @@ public class HolidayRepository {
                 if (result != null) {
                     saveHoliday(result);
                 }
-                callback.showResult(TextUtils.join(",", loadHoliday()));
+                if(callback!=null){
+                    callback.onDataLoaded(TextUtils.join(",", loadHolidayFromLocal()));
+                }
             }
         }).execute(String.format(GET_HOLIDAY, year));
     }
@@ -81,13 +87,14 @@ public class HolidayRepository {
                 if (result != null) {
                     saveSpecialWorkingDay(result);
                 }
-                callback.showResult(TextUtils.join(",", loadSpecialWorkingDay()));
+                callback.onDataLoaded(TextUtils.join(",", loadSpecialWorkingDayFromLocal()));
             }
         }).execute(String.format(GET_SPECIAL_WORKING_DAY, year));
     }
 
     public interface Callback {
-        void showResult(String result);
+        void onDataLoaded(String result);
+        void nDataNotAvailable(String result);
     }
 
 
@@ -109,7 +116,7 @@ public class HolidayRepository {
         editor.apply();
     }
 
-    private ArrayList<String> loadHoliday(){
+    private ArrayList<String> loadHolidayFromLocal(){
         SharedPreferences pref = context.getSharedPreferences(SP_NAME, Context.MODE_PRIVATE);
         Set<String> holidaySet = pref.getStringSet(SP_KEY_HOLIDAY,null);
         if(holidaySet!=null){
@@ -136,12 +143,30 @@ public class HolidayRepository {
         editor.apply();
     }
 
-    private ArrayList<String> loadSpecialWorkingDay(){
+    private ArrayList<String> loadSpecialWorkingDayFromLocal(){
         SharedPreferences pref = context.getSharedPreferences(SP_NAME, Context.MODE_PRIVATE);
         Set<String> holidaySet = pref.getStringSet(SP_KEY_WORKING_DAY,null);
         if(holidaySet!=null){
             return new ArrayList<>(holidaySet);
         }
+        return null;
+    }
+
+    public ArrayList<String> getSpecialWorkday(){
+        SharedPreferences pref = context.getSharedPreferences(SP_NAME, Context.MODE_PRIVATE);
+        long saveTime = pref.getLong(SP_KEY_WORKING_DAY_UPDATE_TIME,0);
+        if(System.currentTimeMillis()-saveTime< DateTimeUtils.DAY_IN_MILISECOND){
+            Set<String> workdaySet =  pref.getStringSet(SP_KEY_WORKING_DAY,null);
+            if(workdaySet!=null){
+                return new ArrayList<>(workdaySet);
+            }else{
+                return null;
+            }
+        }else{
+            return null;
+        }
+    }
+    public ArrayList<String> getHoliday(){
         return null;
     }
 }

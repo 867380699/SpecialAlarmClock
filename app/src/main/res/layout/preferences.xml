@@ -12,16 +12,19 @@
         <include layout="@layout/time_picker"/>
         <include layout="@layout/simple_edit_text"/>
 
-        <include layout="@layout/week_button"/>
+        <include layout="@layout/week_button"
+            android:id="@+id/ll_repeat"/>
         <LinearLayout
             android:id="@+id/ll_ring"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingLeft="8dp"
             android:orientation="vertical">
             <TextView android:id="@+id/tv_ring_title"
                       android:layout_width="match_parent"
                       android:layout_height="wrap_content"
                       android:layout_marginTop="8dp"
+                      android:text="铃声"
                       android:textAppearance="?attr/textAppearanceListItem" />
 
             <TextView android:id="@+id/tv_ring_subtitle"

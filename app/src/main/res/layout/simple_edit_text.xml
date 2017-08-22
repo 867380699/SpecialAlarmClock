@@ -2,7 +2,6 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
-
               android:layout_height="wrap_content"
               android:orientation="vertical"
               style="com.android.internal.R.styleable.TwoLineListItem">
@@ -22,8 +21,5 @@
         android:id="@+id/tagText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="18sp"
-        android:textAppearance="?attr/textAppearanceListItem"
-        android:singleLine="false"/>
-
+        android:textSize="18sp"/>
 </LinearLayout>

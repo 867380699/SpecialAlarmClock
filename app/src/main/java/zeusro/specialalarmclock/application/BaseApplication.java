@@ -3,16 +3,18 @@ package zeusro.specialalarmclock.application;
 import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
-import android.util.Log;
 
 /**
+ *
  * Created by Administrator on 2017/8/18 0018.
  */
 
 public class BaseApplication extends Application {
+    private static BaseApplication self;
     @Override
     public void onCreate(){
         super.onCreate();
+        self = this;
         this.registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks(){
 
             @Override
@@ -51,4 +53,8 @@ public class BaseApplication extends Application {
             }
         });
     }
+    public static BaseApplication getInstance(){
+        return self;
+    }
+
 }

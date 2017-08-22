@@ -60,7 +60,7 @@ public class Database extends SQLiteOpenHelper {
 
     public static long create(Alarm alarm) {
         ContentValues cv = new ContentValues();
-        cv.put(COLUMN_ALARM_ACTIVE, alarm.IsAlarmActive());
+        cv.put(COLUMN_ALARM_ACTIVE, alarm.isActive());
         cv.put(COLUMN_ALARM_TIME, alarm.getAlarmTimeString());
 
         try {
@@ -83,7 +83,7 @@ public class Database extends SQLiteOpenHelper {
 
     public static int update(Alarm alarm) {
         ContentValues cv = new ContentValues();
-        cv.put(COLUMN_ALARM_ACTIVE, alarm.IsAlarmActive());
+        cv.put(COLUMN_ALARM_ACTIVE, alarm.isActive());
         cv.put(COLUMN_ALARM_TIME, alarm.getAlarmTimeString());
 
         try {
@@ -134,7 +134,7 @@ public class Database extends SQLiteOpenHelper {
 
             alarm = new Alarm();
             alarm.setId(c.getInt(0));
-            alarm.setAlarmActive(c.getInt(1) == 1);
+            alarm.setActive(c.getInt(1) == 1);
             alarm.setAlarmTime(c.getString(2));
             byte[] repeatDaysBytes = c.getBlob(3);
 
@@ -208,7 +208,7 @@ public class Database extends SQLiteOpenHelper {
 
                 Alarm alarm = new Alarm();
                 alarm.setId(cursor.getInt(0));
-                alarm.setAlarmActive(cursor.getInt(1) == 1);
+                alarm.setActive(cursor.getInt(1) == 1);
                 alarm.setAlarmTime(cursor.getString(2));
                 byte[] repeatDaysBytes = cursor.getBlob(3);
 

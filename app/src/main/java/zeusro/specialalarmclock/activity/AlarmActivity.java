@@ -95,7 +95,7 @@ public class AlarmActivity extends BaseActivity implements View.OnClickListener{
         if (v.getId() == R.id.checkBox_alarm_active) {
             CheckBox checkBox = (CheckBox) v;
             Alarm alarm = (Alarm) alarmListAdapter.getItem((Integer) checkBox.getTag());
-            alarm.setAlarmActive(checkBox.isChecked());
+            alarm.setActive(checkBox.isChecked());
             Database.update(alarm);
             AlarmActivity.this.callAlarmServiceBroadcastReceiver(alarm);
             if (checkBox.isChecked()) {
@@ -180,14 +180,24 @@ public class AlarmActivity extends BaseActivity implements View.OnClickListener{
                     CreateNotification(null);
                     repository.getHolidayFromRemote("2017", new HolidayRepository.Callback() {
                         @Override
-                        public void showResult(String result) {
+                        public void onDataLoaded(String result) {
                             Toast.makeText(AlarmActivity.this,"holiday: "+ result, Toast.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void nDataNotAvailable(String result) {
+
                         }
                     });
                     repository.getSpecialWorkingDayFromRemote("2017", new HolidayRepository.Callback() {
                         @Override
-                        public void showResult(String result) {
+                        public void onDataLoaded(String result) {
                             Toast.makeText(AlarmActivity.this,"workingDay: "+result, Toast.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void nDataNotAvailable(String result) {
+
                         }
                     });
                 }
