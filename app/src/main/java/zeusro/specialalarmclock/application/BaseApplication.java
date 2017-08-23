@@ -2,6 +2,7 @@ package zeusro.specialalarmclock.application;
 
 import android.app.Activity;
 import android.app.Application;
+import android.content.Context;
 import android.os.Bundle;
 
 /**
@@ -11,9 +12,20 @@ import android.os.Bundle;
 
 public class BaseApplication extends Application {
     private static BaseApplication self;
+
+    public static Context getContext() {
+        return context;
+    }
+
+    public static void setContext(Context context) {
+        BaseApplication.context = context;
+    }
+
+    private static Context context;
     @Override
     public void onCreate(){
         super.onCreate();
+        this.context=getApplicationContext();
         self = this;
         this.registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks(){
 

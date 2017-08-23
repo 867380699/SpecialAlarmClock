@@ -9,8 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
-        <include layout="@layout/time_picker"/>
-        <include layout="@layout/simple_edit_text"/>
+        <include layout="@layout/simple_edit_text" />
 
         <include layout="@layout/week_button"
             android:id="@+id/ll_repeat"/>
@@ -33,6 +32,7 @@
         </LinearLayout>
 
         <include layout="@android:layout/simple_list_item_checked"/>
+        <include layout="@layout/time_picker"/>
     </LinearLayout>
 </ScrollView>
 

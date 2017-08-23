@@ -26,6 +26,7 @@ import zeusro.specialalarmclock.Database;
 import zeusro.specialalarmclock.R;
 import zeusro.specialalarmclock.bean.Alarm;
 import zeusro.specialalarmclock.utils.TextWatcherAdapter;
+import zeusro.specialalarmclock.utils.TimePickerUtils;
 import zeusro.specialalarmclock.utils.ToastUtils;
 
 public class AlarmPreferencesActivity extends BaseActivity {
@@ -238,7 +239,8 @@ public class AlarmPreferencesActivity extends BaseActivity {
         int oldMinute = alarm.getAlarmTime().get(Calendar.MINUTE);
         timePicker.setCurrentHour(oldHour);
         timePicker.setCurrentMinute(oldMinute);
-
+        timePicker.setIs24HourView(true);
+        TimePickerUtils.setTimerPickerStyle(timePicker);
         final Calendar newAlarmTime = Calendar.getInstance();
 //        newAlarmTime.set(Calendar.HOUR_OF_DAY, Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
 //        newAlarmTime.set(Calendar.MINUTE, Calendar.getInstance().get(Calendar.MINUTE) + 1);

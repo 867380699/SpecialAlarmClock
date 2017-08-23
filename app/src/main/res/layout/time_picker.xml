@@ -5,6 +5,7 @@
               android:paddingBottom="8dp"
               android:orientation="vertical">
     <zeusro.specialalarmclock.view.MyTimePicker
+        android:timePickerMode="spinner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/timePicker"/>
