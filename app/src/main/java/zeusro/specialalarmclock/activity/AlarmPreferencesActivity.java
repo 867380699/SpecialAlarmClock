@@ -1,6 +1,7 @@
 package zeusro.specialalarmclock.activity;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.media.AudioManager;
@@ -13,23 +14,32 @@ import android.os.CountDownTimer;
 import android.os.Vibrator;
 import android.text.Editable;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.CheckedTextView;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
+
+import com.bigkoo.alertview.AlertView;
+import com.bigkoo.alertview.OnItemClickListener;
 
 import java.util.Calendar;
 
 import zeusro.specialalarmclock.Database;
 import zeusro.specialalarmclock.R;
+import zeusro.specialalarmclock.application.BaseApplication;
 import zeusro.specialalarmclock.bean.Alarm;
 import zeusro.specialalarmclock.utils.TextWatcherAdapter;
 import zeusro.specialalarmclock.utils.TimePickerUtils;
 import zeusro.specialalarmclock.utils.ToastUtils;
 
-public class AlarmPreferencesActivity extends BaseActivity {
+public class AlarmPreferencesActivity extends BaseActivity  implements View.OnClickListener, OnItemClickListener{
     public static final String TAG = "AlarmPreferences";
     public static final String KEY_ALARM = "alarm";
     private Alarm alarm;
@@ -38,7 +48,12 @@ public class AlarmPreferencesActivity extends BaseActivity {
     private TimePicker timePicker;
     private String[] alarmTones;
     private String[] alarmTonePaths;
-
+    private Button cancelBtn;
+    private Button saveAlarmBtn;
+    private LinearLayout editRemark;
+    private AlertView mAlertViewExt;
+    private EditText etName;
+    private InputMethodManager imm;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,12 +65,32 @@ public class AlarmPreferencesActivity extends BaseActivity {
             alarm = new Alarm();
             alarm.getAlarmTime().set(Calendar.MINUTE,Calendar.getInstance().get(Calendar.MINUTE) + 1);
         }
+        getSupportActionBar().hide();
         queryRingtoneList();
         setMathAlarm(alarm);
         initTitleEditor();
         initTimePicker();
         initRepeatButton();
         initCheckedTextView();
+        initToolBarBtn();
+        initEditRemark();
+    }
+
+    private void initEditRemark() {
+        editRemark=(LinearLayout)findViewById(R.id.edit_remark);
+        editRemark.setOnClickListener(this);
+        imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+        mAlertViewExt = new AlertView("备注", null, "取消", null, new String[]{"确定"}, this, AlertView.Style.Alert, this);
+        ViewGroup extView = (ViewGroup) LayoutInflater.from(this).inflate(R.layout.alertext_form,null);
+        etName = (EditText) extView.findViewById(R.id.etName);
+        mAlertViewExt.addExtView(extView);
+    }
+
+    private void initToolBarBtn() {
+        cancelBtn= (Button) findViewById(R.id.cancel_alarm);
+        saveAlarmBtn=(Button)findViewById(R.id.save_alarm);
+        cancelBtn.setOnClickListener(this);
+        saveAlarmBtn.setOnClickListener(this);
     }
 
 
@@ -280,24 +315,15 @@ public class AlarmPreferencesActivity extends BaseActivity {
 
     @Override
     public void onBackPressed() {
-        Database.init(getApplicationContext());
-        if (alarm.getId() < 1) {
-            long id = Database.create(alarm);
-            alarm.setId(id);
-        } else {
-            Database.update(alarm);
-        }
-        callAlarmServiceBroadcastReceiver(alarm);
-        ToastUtils.show(alarm.getTimeUntilNextAlarmMessage());
+        releaseMusicPlayer();
+        super.onBackPressed();
+        finish();
         //跨activity传值,用于测试
 //        Intent resultIntent = new Intent();
 //        Bundle bundle = new Bundle();
 //        bundle.putSerializable("object", alarm);
 //        resultIntent.putExtras(bundle);
 //        setResult(RESULT_OK, resultIntent);
-        releaseMusicPlayer();
-        super.onBackPressed();
-        finish();
     }
 
     @Override
@@ -315,11 +341,69 @@ public class AlarmPreferencesActivity extends BaseActivity {
         }
     }
 
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.save_alarm:{
+                Database.init(getApplicationContext());
+                if (alarm.getId() < 1) {
+                    long id = Database.create(alarm);
+                    alarm.setId(id);
+                } else {
+                    Database.update(alarm);
+                }
+                callAlarmServiceBroadcastReceiver(alarm);
+                ToastUtils.show(alarm.getTimeUntilNextAlarmMessage());
+                releaseMusicPlayer();
+                finish();
+                break;
+            }
+            case R.id.cancel_alarm:{
+                releaseMusicPlayer();
+                finish();
+                break;
+            }
+            case R.id.edit_remark:{
+                mAlertViewExt.show();
+                break;
+            }
+            default:{
+                break;
+            }
+        }
+    }
+
+
+
     private void releaseMusicPlayer() {
         if (mediaPlayer != null){
             mediaPlayer.release();
             mediaPlayer = null;
         }
+    }
+
+    @Override
+    public void onItemClick(Object o, int position) {
+        closeKeyboard();
+        //判断是否是拓展窗口View，而且点击的是非取消按钮
+        if(o == mAlertViewExt && position != AlertView.CANCELPOSITION){
+            String name = etName.getText().toString();
+            if(name.isEmpty()){
+//                Toast.makeText(this, "啥都没填呢", Toast.LENGTH_SHORT).show();
+            }
+            else{
+                Toast.makeText(this, "hello,"+name, Toast.LENGTH_SHORT).show();
+            }
+
+            return;
+        }
+    }
+
+    private void closeKeyboard() {
+        //关闭软键盘
+        imm.hideSoftInputFromWindow(etName.getWindowToken(),0);
+        //恢复位置
+        mAlertViewExt.setMarginBottom(0);
     }
 }
 

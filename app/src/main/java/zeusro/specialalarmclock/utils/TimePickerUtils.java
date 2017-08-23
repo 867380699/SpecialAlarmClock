@@ -2,6 +2,7 @@ package zeusro.specialalarmclock.utils;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.Log;
 import android.util.TypedValue;
@@ -38,7 +39,8 @@ public class TimePickerUtils {
     public static void setNumberPickerStyle(NumberPicker numberPicker){
         final int count = numberPicker.getChildCount();
         //这里就是要设置的颜色，修改一下作为参数传入会更好
-        final int color = BaseApplication.getContext().getResources().getColor(android.R.color.holo_orange_dark);
+        int color= Color.argb(255,205,85,85);
+//        final int color = BaseApplication.getContext().getResources().getColor(myColor);
 
         for(int i = 0; i < count; i++){
             View child = numberPicker.getChildAt(i);

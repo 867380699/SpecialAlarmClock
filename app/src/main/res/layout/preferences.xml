@@ -9,6 +9,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
+        <include layout="@layout/my_action_bar" />
+
         <include layout="@layout/simple_edit_text" />
 
         <include layout="@layout/week_button"

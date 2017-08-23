@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout   xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#EEE9E9"
+    android:minHeight="55dp"
+    android:orientation="horizontal">
+    <Button
+        android:layout_width="60dp"
+        android:background="#EEE9E9"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="5dp"
+        android:layout_height="40dp"
+        android:id="@+id/cancel_alarm"
+        android:text="取消"/>
+    <TextView
+        android:layout_width="120dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:textSize="18sp"
+        android:layout_marginTop="5dp"
+        android:layout_height="40dp"
+        android:text="设置闹钟" />
+    <Button
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="5dp"
+        android:background="#1E90FF"
+        android:textColor="#ffffff"
+        android:layout_width="60dp"
+        android:layout_height="40dp"
+        android:id="@+id/save_alarm"
+        android:text="确定"/>
+</LinearLayout  >
