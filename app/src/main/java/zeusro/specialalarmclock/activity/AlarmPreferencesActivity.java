@@ -22,12 +22,14 @@ import android.widget.Button;
 import android.widget.CheckedTextView;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.bigkoo.alertview.AlertView;
 import com.bigkoo.alertview.OnItemClickListener;
+import com.kyleduo.switchbutton.SwitchButton;
 
 import java.util.Calendar;
 
@@ -50,10 +52,11 @@ public class AlarmPreferencesActivity extends BaseActivity  implements View.OnCl
     private String[] alarmTonePaths;
     private Button cancelBtn;
     private Button saveAlarmBtn;
-    private LinearLayout editRemark;
+    private RelativeLayout editRemark;
     private AlertView mAlertViewExt;
     private EditText etName;
     private InputMethodManager imm;
+    private TextView editRemarkText;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,13 +74,14 @@ public class AlarmPreferencesActivity extends BaseActivity  implements View.OnCl
         initTitleEditor();
         initTimePicker();
         initRepeatButton();
-        initCheckedTextView();
+        initSwitchButtonView();
         initToolBarBtn();
         initEditRemark();
     }
 
     private void initEditRemark() {
-        editRemark=(LinearLayout)findViewById(R.id.edit_remark);
+        editRemark=(RelativeLayout)findViewById(R.id.remark_relative_layout);
+        editRemarkText=(TextView)findViewById(R.id.remark_text_secondary);
         editRemark.setOnClickListener(this);
         imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
         mAlertViewExt = new AlertView("备注", null, "取消", null, new String[]{"确定"}, this, AlertView.Style.Alert, this);
@@ -98,14 +102,14 @@ public class AlarmPreferencesActivity extends BaseActivity  implements View.OnCl
         Thread t=new Thread(new Runnable() {
             @Override
             public void run() {
-//                Bundle bundle=AlarmPreferencesActivity.this.getIntent().getExtras();
-//                if(bundle!=null){
-//                    alarmTones=(String[])bundle.getSerializable("alarmTones");
-//                    alarmTonePaths=(String[])bundle.getSerializable("alarmTonePaths");
-//                }
-//                if(alarmTones!=null && alarmTonePaths!=null){
-//                    return;
-//                }
+                Bundle bundle=AlarmPreferencesActivity.this.getIntent().getExtras();
+                if(bundle!=null){
+                    alarmTones=(String[])bundle.getSerializable("alarmTones");
+                    alarmTonePaths=(String[])bundle.getSerializable("alarmTonePaths");
+                }
+                if(alarmTones!=null && alarmTonePaths!=null){
+                    return;
+                }
                 RingtoneManager ringtoneMgr = new RingtoneManager(AlarmPreferencesActivity.this);
                 ringtoneMgr.setType(RingtoneManager.TYPE_ALARM);
                 Cursor alarmsCursor = ringtoneMgr.getCursor();
@@ -122,8 +126,8 @@ public class AlarmPreferencesActivity extends BaseActivity  implements View.OnCl
                         alarmTonePaths[alarmsCursor.getPosition() + 1] = ringtoneMgr.getRingtoneUri(position).toString();
                     } while (alarmsCursor.moveToNext());
                 }
-//                AlarmPreferencesActivity.this.getIntent().putExtra("alarmTones",alarmTones);
-//                AlarmPreferencesActivity.this.getIntent().putExtra("alarmTonePaths",alarmTonePaths);
+                AlarmPreferencesActivity.this.getIntent().putExtra("alarmTones",alarmTones);
+                AlarmPreferencesActivity.this.getIntent().putExtra("alarmTonePaths",alarmTonePaths);
                 Log.d(TAG, "Finished Loading " + alarmTones.length + " Ringtones.");
                 alarmsCursor.close();
                 runOnUiThread(new Runnable() {
@@ -140,11 +144,7 @@ public class AlarmPreferencesActivity extends BaseActivity  implements View.OnCl
     }
 
     private void initRingtoneSelector() {
-        TextView text1 = (TextView) findViewById(R.id.tv_ring_title);
-        text1.setTextSize(18);
-        text1.setText("铃声");
-
-        TextView text2 = (TextView) findViewById(R.id.tv_ring_subtitle);
+        final TextView text2 = (TextView) findViewById(R.id.tv_ring_subtitle);
 
         Uri alarmToneUri = Uri.parse(alarm.getAlarmTonePath());
         Ringtone alarmTone = RingtoneManager.getRingtone(this, alarmToneUri);
@@ -167,6 +167,7 @@ public class AlarmPreferencesActivity extends BaseActivity  implements View.OnCl
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         alarm.setAlarmTonePath(alarmTonePaths[which]);
+                        text2.setText(alarmTones[which]);
                         if (alarm.getAlarmTonePath() != null) {
                             if (mediaPlayer == null) {
                                 mediaPlayer = new MediaPlayer();
@@ -223,15 +224,14 @@ public class AlarmPreferencesActivity extends BaseActivity  implements View.OnCl
         });
     }
 
-    private void initCheckedTextView() {
-        CheckedTextView checkedTextView = (CheckedTextView) findViewById(android.R.id.text1);
-        checkedTextView.setText("振动");
-        checkedTextView.setChecked(alarm.IsVibrate());
-        checkedTextView.setOnClickListener(new View.OnClickListener() {
+    private void initSwitchButtonView() {
+        final SwitchButton switchButton = (SwitchButton) findViewById(R.id.shake_switch_btn);
+        switchButton.setChecked(alarm.IsVibrate());
+        switchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                boolean checked = !((CheckedTextView)v).isChecked();
-                ((CheckedTextView) v).setChecked(checked);
+                boolean checked = switchButton.isChecked();
+//                switchButton.setChecked(checked);
                 alarm.setVibrate(checked);
                 if (checked) {
                     Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
@@ -244,8 +244,8 @@ public class AlarmPreferencesActivity extends BaseActivity  implements View.OnCl
     private void initRepeatButton() {
         final TextView tvRepeat = (TextView) findViewById(R.id.tv_repeat);
         tvRepeat.setText(Alarm.getRepeatTypeString(alarm.getRepeatType()));
-        LinearLayout llRepeat = (LinearLayout) findViewById(R.id.ll_repeat);
-        llRepeat.setOnClickListener(new View.OnClickListener() {
+        RelativeLayout rlRepeat = (RelativeLayout) findViewById(R.id.week_relative_layout);
+        rlRepeat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(AlarmPreferencesActivity.this);
@@ -297,14 +297,14 @@ public class AlarmPreferencesActivity extends BaseActivity  implements View.OnCl
     }
 
     private void initTitleEditor() {
-        EditText etTitle = (EditText) findViewById(R.id.tagText);
-        etTitle.setText(alarm.getAlarmName());
-        etTitle.addTextChangedListener(new TextWatcherAdapter() {
-            @Override
-            public void afterTextChanged(Editable s) {
-                alarm.setAlarmName(s.toString());
-            }
-        });
+//        EditText etTitle = (EditText) findViewById(R.id.tagText);
+//        etTitle.setText(alarm.getAlarmName());
+//        etTitle.addTextChangedListener(new TextWatcherAdapter() {
+//            @Override
+//            public void afterTextChanged(Editable s) {
+//                alarm.setAlarmName(s.toString());
+//            }
+//        });
     }
 
     public void setMathAlarm(Alarm alarm) {
@@ -363,7 +363,7 @@ public class AlarmPreferencesActivity extends BaseActivity  implements View.OnCl
                 finish();
                 break;
             }
-            case R.id.edit_remark:{
+            case R.id.remark_relative_layout:{
                 mAlertViewExt.show();
                 break;
             }
@@ -387,14 +387,13 @@ public class AlarmPreferencesActivity extends BaseActivity  implements View.OnCl
         closeKeyboard();
         //判断是否是拓展窗口View，而且点击的是非取消按钮
         if(o == mAlertViewExt && position != AlertView.CANCELPOSITION){
-            String name = etName.getText().toString();
-            if(name.isEmpty()){
-//                Toast.makeText(this, "啥都没填呢", Toast.LENGTH_SHORT).show();
+            String content = etName.getText().toString();
+            if(content.isEmpty()){
             }
             else{
-                Toast.makeText(this, "hello,"+name, Toast.LENGTH_SHORT).show();
+                editRemarkText.setText(content);
+                alarm.setAlarmName(content);
             }
-
             return;
         }
     }

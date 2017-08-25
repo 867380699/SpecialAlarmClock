@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="65dp"
+        android:paddingLeft="20dp"
+        android:layout_toLeftOf="@+id/tone_image"
+        android:layout_alignParentLeft="true">
+        <TextView
+            android:id="@+id/shake_primary_text"
+            android:paddingTop="10dp"
+            android:textAppearance="?attr/textAppearanceListItem"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:text="振动"/>
+        <TextView
+            android:id="@+id/shake_secondary_text"
+            android:layout_below="@+id/shake_primary_text"
+            android:paddingTop="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="25dp"
+            android:text="响铃时振动"/>
+
+    </RelativeLayout>
+    <com.kyleduo.switchbutton.SwitchButton
+        android:layout_width="wrap_content"
+        android:id="@+id/shake_switch_btn"
+        app:kswThumbWidth="23dp"
+        android:layout_height="65dp"
+        android:paddingTop="23dp"
+        android:paddingEnd="10dp"
+        android:layout_alignParentRight="true"/>
+
+</RelativeLayout>

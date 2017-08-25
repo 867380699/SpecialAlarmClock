@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/remark_relative_layout"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="65dp"
+        android:paddingLeft="20dp"
+        android:layout_toLeftOf="@+id/remark_image"
+        android:layout_alignParentLeft="true">
+        <TextView
+            android:id="@+id/remark_text_primary"
+            android:paddingTop="10dp"
+            android:textAppearance="?attr/textAppearanceListItem"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:text="备注"/>
+        <TextView
+            android:id="@+id/remark_text_secondary"
+            android:layout_below="@+id/remark_text_primary"
+            android:paddingTop="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="25dp"
+            android:text="无"/>
+
+    </RelativeLayout>
+    <android.support.v7.widget.AppCompatImageView
+        app:srcCompat="@drawable/ic_right_arrow"
+        android:id="@+id/remark_image"
+        android:layout_width="wrap_content"
+        android:layout_height="65dp"
+        android:paddingEnd="20dp"
+        android:layout_alignParentRight="true" />
+</RelativeLayout>
