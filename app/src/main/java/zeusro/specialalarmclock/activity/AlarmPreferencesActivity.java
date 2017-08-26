@@ -3,39 +3,33 @@ package zeusro.specialalarmclock.activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.database.Cursor;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Vibrator;
-import android.text.Editable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.CheckedTextView;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
-import android.widget.Toast;
 
 import com.bigkoo.alertview.AlertView;
 import com.bigkoo.alertview.OnItemClickListener;
+import com.kevalpatel.ringtonepicker.RingtonePickerDialog;
+import com.kevalpatel.ringtonepicker.RingtonePickerListener;
 import com.kyleduo.switchbutton.SwitchButton;
 
 import java.util.Calendar;
 
 import zeusro.specialalarmclock.Database;
 import zeusro.specialalarmclock.R;
-import zeusro.specialalarmclock.application.BaseApplication;
 import zeusro.specialalarmclock.bean.Alarm;
 import zeusro.specialalarmclock.utils.TextWatcherAdapter;
 import zeusro.specialalarmclock.utils.TimePickerUtils;
@@ -45,11 +39,7 @@ public class AlarmPreferencesActivity extends BaseActivity  implements View.OnCl
     public static final String TAG = "AlarmPreferences";
     public static final String KEY_ALARM = "alarm";
     private Alarm alarm;
-    private MediaPlayer mediaPlayer;
-    private CountDownTimer alarmToneTimer;
     private TimePicker timePicker;
-    private String[] alarmTones;
-    private String[] alarmTonePaths;
     private Button cancelBtn;
     private Button saveAlarmBtn;
     private RelativeLayout editRemark;
@@ -69,9 +59,8 @@ public class AlarmPreferencesActivity extends BaseActivity  implements View.OnCl
             alarm.getAlarmTime().set(Calendar.MINUTE,Calendar.getInstance().get(Calendar.MINUTE) + 1);
         }
         getSupportActionBar().hide();
-        queryRingtoneList();
+        initRingtonePicker();
         setMathAlarm(alarm);
-        initTitleEditor();
         initTimePicker();
         initRepeatButton();
         initSwitchButtonView();
@@ -97,135 +86,50 @@ public class AlarmPreferencesActivity extends BaseActivity  implements View.OnCl
         saveAlarmBtn.setOnClickListener(this);
     }
 
-
-    private void queryRingtoneList() {
-        Thread t=new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Bundle bundle=AlarmPreferencesActivity.this.getIntent().getExtras();
-                if(bundle!=null){
-                    alarmTones=(String[])bundle.getSerializable("alarmTones");
-                    alarmTonePaths=(String[])bundle.getSerializable("alarmTonePaths");
-                }
-                if(alarmTones!=null && alarmTonePaths!=null){
-                    return;
-                }
-                RingtoneManager ringtoneMgr = new RingtoneManager(AlarmPreferencesActivity.this);
-                ringtoneMgr.setType(RingtoneManager.TYPE_ALARM);
-                Cursor alarmsCursor = ringtoneMgr.getCursor();
-                alarmTones = new String[alarmsCursor.getCount() + 1];
-                alarmTonePaths = new String[alarmsCursor.getCount() + 1];
-                alarmTones[0] = "无";
-                alarmTonePaths[0] = "";
-                if (alarmsCursor.moveToFirst()) {
-                    do {
-                        int position = alarmsCursor.getPosition();
-                        //Log.d("ITEM", ringtoneMgr.getRingtone(position).getTitle(this));
-                        //Log.d("ITEM", ringtoneMgr.getRingtoneUri(position).toString());
-                        alarmTones[alarmsCursor.getPosition() + 1] = ringtoneMgr.getRingtone(position).getTitle(AlarmPreferencesActivity.this);
-                        alarmTonePaths[alarmsCursor.getPosition() + 1] = ringtoneMgr.getRingtoneUri(position).toString();
-                    } while (alarmsCursor.moveToNext());
-                }
-                AlarmPreferencesActivity.this.getIntent().putExtra("alarmTones",alarmTones);
-                AlarmPreferencesActivity.this.getIntent().putExtra("alarmTonePaths",alarmTonePaths);
-                Log.d(TAG, "Finished Loading " + alarmTones.length + " Ringtones.");
-                alarmsCursor.close();
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        initRingtoneSelector();
-                    }
-                });
-            }
-        });
-        t.start();
-
-
-    }
-
-    private void initRingtoneSelector() {
+    private void initRingtonePicker(){
         final TextView text2 = (TextView) findViewById(R.id.tv_ring_subtitle);
+        text2.setText(alarm.getAlarmToneName());
+         final Uri alarmToneUri = Uri.parse(alarm.getAlarmTonePath());
 
-        Uri alarmToneUri = Uri.parse(alarm.getAlarmTonePath());
-        Ringtone alarmTone = RingtoneManager.getRingtone(this, alarmToneUri);
-
-        text2.setText(alarmTones[0]);
 
         findViewById(R.id.ll_ring).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AlertDialog.Builder alert;
-                alert = new AlertDialog.Builder(AlarmPreferencesActivity.this);
-                alert.setTitle("铃声");
-                CharSequence[] items = new CharSequence[alarmTones.length];
-                for (int i = 0; i < items.length; i++){
-                    items[i] = alarmTones[i];
+                RingtonePickerDialog.Builder ringtonePickerBuilder = new RingtonePickerDialog.Builder(AlarmPreferencesActivity.this, getSupportFragmentManager());
+                ringtonePickerBuilder.setTitle("铃声");
 
-                }
-                alert.setItems(items, new DialogInterface.OnClickListener() {
+                //Add the desirable ringtone types.
+                ringtonePickerBuilder.addRingtoneType(RingtonePickerDialog.Builder.TYPE_MUSIC);
+                ringtonePickerBuilder.addRingtoneType(RingtonePickerDialog.Builder.TYPE_NOTIFICATION);
+                ringtonePickerBuilder.addRingtoneType(RingtonePickerDialog.Builder.TYPE_RINGTONE);
+                ringtonePickerBuilder.addRingtoneType(RingtonePickerDialog.Builder.TYPE_ALARM);
 
+                ringtonePickerBuilder.setPositiveButtonText("设置");
+
+                ringtonePickerBuilder.setCancelButtonText("取消");
+
+                //Set flag true if you want to play the com.ringtonepicker.sample of the clicked tone.
+                ringtonePickerBuilder.setPlaySampleWhileSelection(true);
+
+                ringtonePickerBuilder.setListener(new RingtonePickerListener() {
                     @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        alarm.setAlarmTonePath(alarmTonePaths[which]);
-                        text2.setText(alarmTones[which]);
-                        if (alarm.getAlarmTonePath() != null) {
-                            if (mediaPlayer == null) {
-                                mediaPlayer = new MediaPlayer();
-                            } else {
-                                if (mediaPlayer.isPlaying())
-                                    mediaPlayer.stop();
-                                mediaPlayer.reset();
-                            }
-                            try {
-                                // mediaPlayer.setVolume(1.0f, 1.0f);
-                                mediaPlayer.setVolume(0.2f, 0.2f);
-                                mediaPlayer.setDataSource(AlarmPreferencesActivity.this, Uri.parse(alarm.getAlarmTonePath()));
-                                mediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
-                                mediaPlayer.setLooping(false);
-                                mediaPlayer.prepare();
-                                mediaPlayer.start();
-
-                                // Force the mediaPlayer to stop after 3
-                                // seconds...
-                                if (alarmToneTimer != null)
-                                    alarmToneTimer.cancel();
-                                alarmToneTimer = new CountDownTimer(3000, 3000) {
-                                    @Override
-                                    public void onTick(long millisUntilFinished) {
-
-                                    }
-
-                                    @Override
-                                    public void onFinish() {
-                                        try {
-                                            if (mediaPlayer.isPlaying())
-                                                mediaPlayer.stop();
-                                        } catch (Exception e) {
-
-                                        }
-                                    }
-                                };
-                                alarmToneTimer.start();
-                            } catch (Exception e) {
-                                try {
-                                    if (mediaPlayer.isPlaying())
-                                        mediaPlayer.stop();
-                                } catch (Exception e2) {
-
-                                }
-                            }
-                        }
+                    public void OnRingtoneSelected(String ringtoneName, Uri ringtoneUri) {
+                        alarm.setAlarmTonePath(ringtoneUri.getPath());
+                        alarm.setAlarmToneName(ringtoneName);
+                        text2.setText(ringtoneName);
                         setMathAlarm(alarm);
                     }
-
                 });
-                alert.show();
+                //set the currently selected uri, to mark that ringtone as checked by default. (Optional)
+                ringtonePickerBuilder.setCurrentRingtoneUri(alarmToneUri);
+
+                ringtonePickerBuilder.show();
             }
         });
     }
-
     private void initSwitchButtonView() {
         final SwitchButton switchButton = (SwitchButton) findViewById(R.id.shake_switch_btn);
+        final TextView shakeSecondaryText=(TextView)findViewById(R.id.shake_secondary_text);
         switchButton.setChecked(alarm.IsVibrate());
         switchButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -236,6 +140,9 @@ public class AlarmPreferencesActivity extends BaseActivity  implements View.OnCl
                 if (checked) {
                     Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
                     vibrator.vibrate(1000);
+                    shakeSecondaryText.setText("响铃时振动");
+                }else{
+                    shakeSecondaryText.setText("无");
                 }
             }
         });
@@ -296,17 +203,6 @@ public class AlarmPreferencesActivity extends BaseActivity  implements View.OnCl
         }
     }
 
-    private void initTitleEditor() {
-//        EditText etTitle = (EditText) findViewById(R.id.tagText);
-//        etTitle.setText(alarm.getAlarmName());
-//        etTitle.addTextChangedListener(new TextWatcherAdapter() {
-//            @Override
-//            public void afterTextChanged(Editable s) {
-//                alarm.setAlarmName(s.toString());
-//            }
-//        });
-    }
-
     public void setMathAlarm(Alarm alarm) {
         this.alarm = alarm;
     }
@@ -315,7 +211,6 @@ public class AlarmPreferencesActivity extends BaseActivity  implements View.OnCl
 
     @Override
     public void onBackPressed() {
-        releaseMusicPlayer();
         super.onBackPressed();
         finish();
         //跨activity传值,用于测试
@@ -334,11 +229,6 @@ public class AlarmPreferencesActivity extends BaseActivity  implements View.OnCl
     @Override
     protected void onPause() {
         super.onPause();
-        try {
-            releaseMusicPlayer();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
@@ -354,12 +244,11 @@ public class AlarmPreferencesActivity extends BaseActivity  implements View.OnCl
                 }
                 callAlarmServiceBroadcastReceiver(alarm);
                 ToastUtils.show(alarm.getTimeUntilNextAlarmMessage());
-                releaseMusicPlayer();
+                ToastUtils.show(alarm.getAlarmTonePath());
                 finish();
                 break;
             }
             case R.id.cancel_alarm:{
-                releaseMusicPlayer();
                 finish();
                 break;
             }
@@ -373,15 +262,6 @@ public class AlarmPreferencesActivity extends BaseActivity  implements View.OnCl
         }
     }
 
-
-
-    private void releaseMusicPlayer() {
-        if (mediaPlayer != null){
-            mediaPlayer.release();
-            mediaPlayer = null;
-        }
-    }
-
     @Override
     public void onItemClick(Object o, int position) {
         closeKeyboard();
@@ -389,6 +269,7 @@ public class AlarmPreferencesActivity extends BaseActivity  implements View.OnCl
         if(o == mAlertViewExt && position != AlertView.CANCELPOSITION){
             String content = etName.getText().toString();
             if(content.isEmpty()){
+                editRemarkText.setText("无");
             }
             else{
                 editRemarkText.setText(content);

@@ -42,6 +42,7 @@ public class Alarm implements Serializable {
     private int repeatType;
     private int[] days = {Calendar.SUNDAY, Calendar.MONDAY, Calendar.TUESDAY, Calendar.WEDNESDAY, Calendar.THURSDAY, Calendar.FRIDAY, Calendar.SATURDAY,};
     private String alarmTonePath = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM).toString();
+    private String alarmToneName="无";
     private Boolean vibrate = true;
     private String alarmName = "极简闹钟";
 
@@ -52,6 +53,14 @@ public class Alarm implements Serializable {
     public Alarm setActive(Boolean active) {
         isActive = active;
         return this;
+    }
+
+    public String getAlarmToneName() {
+        return alarmToneName;
+    }
+
+    public void setAlarmToneName(String alarmToneName) {
+        this.alarmToneName = alarmToneName;
     }
 
     public int getRepeatType() {
@@ -236,6 +245,7 @@ public class Alarm implements Serializable {
                 ", alarmTonePath='" + alarmTonePath + '\'' +
                 ", vibrate=" + vibrate +
                 ", alarmName='" + alarmName + '\'' +
+                ", alarmToneName='" + alarmToneName + '\'' +
                 '}';
     }
 
