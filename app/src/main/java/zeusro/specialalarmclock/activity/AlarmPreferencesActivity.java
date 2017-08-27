@@ -71,6 +71,7 @@ public class AlarmPreferencesActivity extends BaseActivity  implements View.OnCl
     private void initEditRemark() {
         editRemark=(RelativeLayout)findViewById(R.id.remark_relative_layout);
         editRemarkText=(TextView)findViewById(R.id.remark_text_secondary);
+        editRemarkText.setText(alarm.getAlarmName());
         editRemark.setOnClickListener(this);
         imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
         mAlertViewExt = new AlertView("备注", null, "取消", null, new String[]{"确定"}, this, AlertView.Style.Alert, this);
@@ -141,8 +142,10 @@ public class AlarmPreferencesActivity extends BaseActivity  implements View.OnCl
                     Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
                     vibrator.vibrate(1000);
                     shakeSecondaryText.setText("响铃时振动");
+                    alarm.setVibrate(true);
                 }else{
                     shakeSecondaryText.setText("无");
+                    alarm.setVibrate(false);
                 }
             }
         });
@@ -244,7 +247,6 @@ public class AlarmPreferencesActivity extends BaseActivity  implements View.OnCl
                 }
                 callAlarmServiceBroadcastReceiver(alarm);
                 ToastUtils.show(alarm.getTimeUntilNextAlarmMessage());
-                ToastUtils.show(alarm.getAlarmTonePath());
                 finish();
                 break;
             }

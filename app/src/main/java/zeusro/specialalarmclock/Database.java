@@ -29,17 +29,18 @@ public class Database extends SQLiteOpenHelper {
     private static SQLiteDatabase database = null;
 
     private static final String DATABASE_NAME = "DB";
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
 
     public static final String ALARM_TABLE = "alarm";
     public static final String COLUMN_ALARM_ID = "_id";
     public static final String COLUMN_ALARM_ACTIVE = "alarm_active";
     public static final String COLUMN_ALARM_TIME = "alarm_time";
     public static final String COLUMN_ALARM_DAYS = "alarm_days";
-    public static final String COLUMN_ALARM_TONE = "alarm_tone";
+    public static final String COLUMN_ALARM_TONE_NAME = "alarm_tone_name";
     public static final String COLUMN_ALARM_VIBRATE = "alarm_vibrate";
     public static final String COLUMN_ALARM_NAME = "alarm_name";
     public static final String COLUMN_ALARM_REPEAT_TYPE = "alarm_repeat_type";
+    public static final String COLUMN_ALARM_TONE_PATH = "alarm_tone_path";
 
     private Database(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -52,7 +53,8 @@ public class Database extends SQLiteOpenHelper {
                 + COLUMN_ALARM_ACTIVE + " INTEGER NOT NULL, "
                 + COLUMN_ALARM_TIME + " TEXT NOT NULL, "
                 + COLUMN_ALARM_DAYS + " BLOB NOT NULL, "
-                + COLUMN_ALARM_TONE + " TEXT NOT NULL, "
+                + COLUMN_ALARM_TONE_NAME + " TEXT NOT NULL, "
+                + COLUMN_ALARM_TONE_PATH + " TEXT NOT NULL, "
                 + COLUMN_ALARM_VIBRATE + " INTEGER NOT NULL, "
                 + COLUMN_ALARM_NAME + " TEXT NOT NULL, "
                 + COLUMN_ALARM_REPEAT_TYPE + " INTEGER DEFAULT 0)");
@@ -60,8 +62,11 @@ public class Database extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        if(newVersion>1){
+        if(oldVersion<2){
             String sql = String.format("ALTER TABLE %s ADD COLUMN %s INTEGER DEFAULT 0",ALARM_TABLE,COLUMN_ALARM_REPEAT_TYPE);
+            db.execSQL(sql);
+        }if(oldVersion<3){
+                String sql = String.format("ALTER TABLE %s ADD COLUMN %s %s DEFAULT 0",ALARM_TABLE,COLUMN_ALARM_TONE_NAME,"TEXT");
             db.execSQL(sql);
         }
     }
@@ -105,7 +110,8 @@ public class Database extends SQLiteOpenHelper {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        cv.put(COLUMN_ALARM_TONE, alarm.getAlarmTonePath());
+        cv.put(COLUMN_ALARM_TONE_NAME, alarm.getAlarmToneName());
+        cv.put(COLUMN_ALARM_TONE_PATH, alarm.getAlarmTonePath());
         cv.put(COLUMN_ALARM_VIBRATE, alarm.IsVibrate());
         cv.put(COLUMN_ALARM_NAME, alarm.getAlarmName());
         cv.put(COLUMN_ALARM_REPEAT_TYPE, alarm.getRepeatType());
@@ -126,7 +132,8 @@ public class Database extends SQLiteOpenHelper {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        cv.put(COLUMN_ALARM_TONE, alarm.getAlarmTonePath());
+        cv.put(COLUMN_ALARM_TONE_NAME, alarm.getAlarmToneName());
+        cv.put(COLUMN_ALARM_TONE_PATH, alarm.getAlarmTonePath());
         cv.put(COLUMN_ALARM_VIBRATE, alarm.IsVibrate());
         cv.put(COLUMN_ALARM_NAME, alarm.getAlarmName());
         cv.put(COLUMN_ALARM_REPEAT_TYPE, alarm.getRepeatType());
@@ -151,7 +158,8 @@ public class Database extends SQLiteOpenHelper {
                 COLUMN_ALARM_ACTIVE,
                 COLUMN_ALARM_TIME,
                 COLUMN_ALARM_DAYS,
-                COLUMN_ALARM_TONE,
+                COLUMN_ALARM_TONE_NAME,
+                COLUMN_ALARM_TONE_PATH,
                 COLUMN_ALARM_VIBRATE,
                 COLUMN_ALARM_NAME,
                 COLUMN_ALARM_REPEAT_TYPE
@@ -191,8 +199,8 @@ public class Database extends SQLiteOpenHelper {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-
-        alarm.setAlarmTonePath(c.getString(c.getColumnIndexOrThrow(COLUMN_ALARM_TONE)));
+        alarm.setAlarmToneName(c.getString(c.getColumnIndexOrThrow(COLUMN_ALARM_TONE_NAME)));
+        alarm.setAlarmTonePath(c.getString(c.getColumnIndexOrThrow(COLUMN_ALARM_TONE_PATH)));
         alarm.setVibrate(c.getInt(c.getColumnIndexOrThrow(COLUMN_ALARM_VIBRATE)) == 1);
         alarm.setAlarmName(c.getString(c.getColumnIndexOrThrow(COLUMN_ALARM_NAME)));
         alarm.setRepeatType(c.getInt(c.getColumnIndexOrThrow(COLUMN_ALARM_REPEAT_TYPE)));
@@ -205,7 +213,8 @@ public class Database extends SQLiteOpenHelper {
                 COLUMN_ALARM_ACTIVE,
                 COLUMN_ALARM_TIME,
                 COLUMN_ALARM_DAYS,
-                COLUMN_ALARM_TONE,
+                COLUMN_ALARM_TONE_NAME,
+                COLUMN_ALARM_TONE_PATH,
                 COLUMN_ALARM_VIBRATE,
                 COLUMN_ALARM_NAME,
                 COLUMN_ALARM_REPEAT_TYPE
