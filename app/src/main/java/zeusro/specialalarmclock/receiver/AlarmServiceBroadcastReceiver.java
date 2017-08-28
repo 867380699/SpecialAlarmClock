@@ -148,6 +148,7 @@ public class AlarmServiceBroadcastReceiver extends WakefulBroadcastReceiver {
         Intent intent = new Intent(context, AlarmServiceBroadcastReceiver.class);
         intent.setAction("zeusro.action.alert");
         intent.putExtra("alarm", alarm.getId());
+        intent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
         System.out.println("set id: " + alarm.getId());
         alarmIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
