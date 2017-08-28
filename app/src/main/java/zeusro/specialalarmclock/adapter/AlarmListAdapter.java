@@ -5,7 +5,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
+import android.widget.Switch;
 import android.widget.TextView;
+
+import com.kyleduo.switchbutton.SwitchButton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,29 +48,49 @@ public class AlarmListAdapter extends BaseAdapter {
         return position;
     }
 
+//    @Override
+//    public View getView(int position, View view, ViewGroup viewGroup) {
+//        if (null == view)
+//            view = LayoutInflater.from(alarmActivity).inflate(R.layout.list_element, null);
+//
+//        Alarm alarm = (Alarm) getItem(position);
+//        CheckBox checkBox = (CheckBox) view.findViewById(R.id.checkBox_alarm_active);
+//        checkBox.setChecked(alarm.isActive());
+//        checkBox.setTag(position);
+//        checkBox.setOnClickListener(alarmActivity);
+//
+//        TextView alarmTimeView = (TextView) view.findViewById(R.id.textView_alarm_time);
+//        alarmTimeView.setText(alarm.getAlarmTimeString());
+//
+//
+//        TextView alarmDaysView = (TextView) view.findViewById(R.id.textView_alarm_days);
+//
+//        alarmDaysView.setText(alarm.getRepeatDaysString());
+//
+//
+//        return view;
+//    }
+
     @Override
     public View getView(int position, View view, ViewGroup viewGroup) {
         if (null == view)
-            view = LayoutInflater.from(alarmActivity).inflate(R.layout.list_element, null);
+            view = LayoutInflater.from(alarmActivity).inflate(R.layout.alarm_list, null);
 
         Alarm alarm = (Alarm) getItem(position);
-        CheckBox checkBox = (CheckBox) view.findViewById(R.id.checkBox_alarm_active);
-        checkBox.setChecked(alarm.isActive());
-        checkBox.setTag(position);
-        checkBox.setOnClickListener(alarmActivity);
 
-        TextView alarmTimeView = (TextView) view.findViewById(R.id.textView_alarm_time);
+        SwitchButton switchButton=(SwitchButton) view.findViewById(R.id.alarm_list_switch);
+        switchButton.setChecked(alarm.isActive());
+        switchButton.setOnClickListener(alarmActivity);
+        switchButton.setTag(position);
+        TextView alarmTimeView = (TextView) view.findViewById(R.id.alarm_list_time);
         alarmTimeView.setText(alarm.getAlarmTimeString());
 
+        TextView alarmRepeatView=(TextView)view.findViewById(R.id.alarm_list_repeat);
+        alarmRepeatView.setText(alarm.getRepeatTypeString(alarm.getRepeatType()));
 
-        TextView alarmDaysView = (TextView) view.findViewById(R.id.textView_alarm_days);
-
-        alarmDaysView.setText(alarm.getRepeatDaysString());
-
-
+        view.setMinimumHeight(150);
         return view;
     }
-
     public List<Alarm> getMathAlarms() {
         return alarms;
     }

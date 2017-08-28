@@ -100,7 +100,7 @@ public class AlarmAlertActivity extends AppCompatActivity{
     private void startAlarm() {
         if (!"".equals(alarm.getAlarmTonePath())) {
             mediaPlayer = new MediaPlayer();
-            if (alarm.IsVibrate()) {
+            if (alarm.getVibrate()) {
                 vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
                 long[] pattern = {1000, 200, 200, 200};
                 vibrator.vibrate(pattern, 0);

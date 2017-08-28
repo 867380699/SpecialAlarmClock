@@ -18,6 +18,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.kyleduo.switchbutton.SwitchButton;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -100,13 +102,13 @@ public class AlarmActivity extends BaseActivity implements View.OnClickListener{
      */
     @Override
     public void onClick(View v) {
-        if (v.getId() == R.id.checkBox_alarm_active) {
-            CheckBox checkBox = (CheckBox) v;
-            Alarm alarm = (Alarm) alarmListAdapter.getItem((Integer) checkBox.getTag());
-            alarm.setActive(checkBox.isChecked());
+        if (v.getId() == R.id.alarm_list_switch) {
+            SwitchButton switchButton=(SwitchButton)v;
+            Alarm alarm = (Alarm) alarmListAdapter.getItem((Integer) switchButton.getTag());
+            alarm.setActive(switchButton.isChecked());
             Database.update(alarm);
             AlarmActivity.this.callAlarmServiceBroadcastReceiver(alarm);
-            if (checkBox.isChecked()) {
+            if (switchButton.isChecked()) {
                 ToastUtils.show(alarm.getTimeUntilNextAlarmMessage());
             }
         }
@@ -131,6 +133,7 @@ public class AlarmActivity extends BaseActivity implements View.OnClickListener{
 
     private void initAlarmList() {
         lvAlarm = (ListView) findViewById(R.id.listView);
+        Log.i("的的的的的的的的顶顶顶顶顶   的的的的的的",lvAlarm==null?"是啊":"不是");
         if (lvAlarm != null) {
             lvAlarm.setLongClickable(true);
             lvAlarm.setOnItemLongClickListener(new OnItemLongClickListener() {

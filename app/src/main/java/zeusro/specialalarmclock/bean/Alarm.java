@@ -152,13 +152,10 @@ public class Alarm implements Serializable {
     /**
      * @return the vibrate
      */
-    public Boolean IsVibrate() {
+    public Boolean getVibrate() {
         return vibrate;
     }
 
-    /**
-     * @param vibrate the vibrate to set
-     */
     public void setVibrate(Boolean vibrate) {
         this.vibrate = vibrate;
     }
