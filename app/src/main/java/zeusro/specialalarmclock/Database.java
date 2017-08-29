@@ -112,7 +112,7 @@ public class Database extends SQLiteOpenHelper {
         }
         cv.put(COLUMN_ALARM_TONE_NAME, alarm.getAlarmToneName());
         cv.put(COLUMN_ALARM_TONE_PATH, alarm.getAlarmTonePath());
-        cv.put(COLUMN_ALARM_VIBRATE, alarm.IsVibrate());
+        cv.put(COLUMN_ALARM_VIBRATE, alarm.getVibrate());
         cv.put(COLUMN_ALARM_NAME, alarm.getAlarmName());
         cv.put(COLUMN_ALARM_REPEAT_TYPE, alarm.getRepeatType());
         return getDatabase().insert(ALARM_TABLE, null, cv);
@@ -134,7 +134,7 @@ public class Database extends SQLiteOpenHelper {
         }
         cv.put(COLUMN_ALARM_TONE_NAME, alarm.getAlarmToneName());
         cv.put(COLUMN_ALARM_TONE_PATH, alarm.getAlarmTonePath());
-        cv.put(COLUMN_ALARM_VIBRATE, alarm.IsVibrate());
+        cv.put(COLUMN_ALARM_VIBRATE, alarm.getVibrate());
         cv.put(COLUMN_ALARM_NAME, alarm.getAlarmName());
         cv.put(COLUMN_ALARM_REPEAT_TYPE, alarm.getRepeatType());
         return getDatabase().update(ALARM_TABLE, cv, "_id=" + alarm.getId(), null);

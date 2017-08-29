@@ -3,11 +3,8 @@ package zeusro.specialalarmclock.activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.os.Vibrator;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -31,7 +28,6 @@ import java.util.Calendar;
 import zeusro.specialalarmclock.Database;
 import zeusro.specialalarmclock.R;
 import zeusro.specialalarmclock.bean.Alarm;
-import zeusro.specialalarmclock.utils.TextWatcherAdapter;
 import zeusro.specialalarmclock.utils.TimePickerUtils;
 import zeusro.specialalarmclock.utils.ToastUtils;
 
@@ -130,8 +126,8 @@ public class AlarmPreferencesActivity extends BaseActivity  implements View.OnCl
     }
     private void initSwitchButtonView() {
         final SwitchButton switchButton = (SwitchButton) findViewById(R.id.shake_switch_btn);
+        switchButton.setChecked(alarm.getVibrate());
         final TextView shakeSecondaryText=(TextView)findViewById(R.id.shake_secondary_text);
-        switchButton.setChecked(alarm.IsVibrate());
         switchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

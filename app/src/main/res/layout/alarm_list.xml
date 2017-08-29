@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:descendantFocusability="blocksDescendants">
+
+    <TextView
+        android:id="@+id/alarm_list_time"
+        android:layout_width="80dp"
+        android:layout_height="match_parent"
+        android:padding="8dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:layout_gravity="center"
+        android:textSize="24sp"/>
+
+    <View
+        android:id="@+id/alarm_list_border"
+        android:layout_width="1dp"
+        android:layout_marginTop="6dp"
+        android:layout_marginBottom="6dp"
+        android:layout_height="match_parent"
+        android:background="#aaaaaa"/>
+
+    <TextView
+        android:id="@+id/alarm_list_repeat"
+        android:layout_width="0dp"
+        android:layout_gravity="center"
+        android:gravity="center|start"
+        android:layout_weight="1"
+        android:layout_height="match_parent"
+        android:layout_marginStart="1dp"
+        android:padding="8dp"/>
+
+    <com.kyleduo.switchbutton.SwitchButton
+        android:id="@+id/alarm_list_switch"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:padding="8dp"/>
+</LinearLayout>
