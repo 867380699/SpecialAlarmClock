@@ -32,7 +32,7 @@ public class HolidayRepository {
     private static final String SP_KEY_HOLIDAY = "holiday_list";
     private static final String SP_KEY_HOLIDAY_UPDATE_TIME = "holiday_list_update_time";
     private static final String SP_KEY_WORKING_DAY = "working_day_list";
-    private static final String SP_KEY_WORKING_DAY_UPDATE_TIME = "holiday_list_update_time";
+    private static final String SP_KEY_WORKDAY_UPDATE_TIME = "holiday_list_update_time";
     private Context context;
 
     public interface Callback {
@@ -76,6 +76,9 @@ public class HolidayRepository {
         }).execute(String.format(GET_HOLIDAY, year));
     }
 
+    public void getHolidayFromRemote(int year, final Callback callback){
+        getHolidayFromRemote(Integer.toString(year),callback);
+    }
     /**
      * 从服务器获取某年的特殊工作日, 并缓存到本地
      *
@@ -93,14 +96,21 @@ public class HolidayRepository {
             public void showResult(String result) {
                 if (result != null) {
                     saveSpecialWorkingDayToLocal(result);
-                    callback.onDataLoaded(loadSpecialWorkingDayFromLocal());
-                }else{
-                    callback.onDataNotAvailable("");
+                }
+                if(callback!=null){
+                    if (result != null) {
+                        callback.onDataLoaded(loadSpecialWorkingDayFromLocal());
+                    }else{
+                        callback.onDataNotAvailable("");
+                    }
                 }
             }
         }).execute(String.format(GET_SPECIAL_WORKING_DAY, year));
     }
 
+    public void getSpecialWorkingDayFromRemote(int year, final Callback callback){
+        getSpecialWorkingDayFromRemote(Integer.toString(year),callback);
+    }
     /**
      * 将从服务器获取来的数据处理后存储至本地
      * @param holidays 服务器返回的txt数据
@@ -149,7 +159,7 @@ public class HolidayRepository {
         SharedPreferences pref = context.getSharedPreferences(SP_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = pref.edit();
         editor.putStringSet(SP_KEY_WORKING_DAY, new ArraySet<>(holidayList));
-        editor.putLong(SP_KEY_WORKING_DAY_UPDATE_TIME, System.currentTimeMillis());
+        editor.putLong(SP_KEY_WORKDAY_UPDATE_TIME, System.currentTimeMillis());
         editor.apply();
     }
 
@@ -168,7 +178,7 @@ public class HolidayRepository {
      */
     public void getSpecialWorkday(final Callback callback){
         SharedPreferences pref = context.getSharedPreferences(SP_NAME, Context.MODE_PRIVATE);
-        long saveTime = pref.getLong(SP_KEY_WORKING_DAY_UPDATE_TIME,0);
+        long saveTime = pref.getLong(SP_KEY_WORKDAY_UPDATE_TIME,0);
         if(System.currentTimeMillis()-saveTime< DateTimeUtils.DAY_IN_MILISECOND){
             Set<String> workdaySet =  pref.getStringSet(SP_KEY_WORKING_DAY,null);
             if(workdaySet!=null){
@@ -208,5 +218,27 @@ public class HolidayRepository {
         return null;
     }
 
+    public void updateHolidayAndWorkday(boolean force){
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        if(force){
+            getHolidayFromRemote(year,null);
+            getSpecialWorkingDayFromRemote(year,null);
+        }else {
+            SharedPreferences pref = context.getSharedPreferences(SP_NAME, Context.MODE_PRIVATE);
+            long current = System.currentTimeMillis();
+            long lastWorkdayUpdateTime = pref.getLong(SP_KEY_WORKDAY_UPDATE_TIME,current);
+            long lastHolidayUpdateTime = pref.getLong(SP_KEY_HOLIDAY_UPDATE_TIME,current);
+            if(current-lastHolidayUpdateTime>DateTimeUtils.DAY_IN_MILISECOND){
+                getHolidayFromRemote(year,null);
+            }
+            if(current-lastWorkdayUpdateTime>DateTimeUtils.DAY_IN_MILISECOND){
+                getSpecialWorkingDayFromRemote(year,null);
+            }
+        }
+    }
 
+    public void updateHolidayAndWorkday(){
+        updateHolidayAndWorkday(false);
+    }
 }

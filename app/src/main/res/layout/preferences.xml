@@ -4,36 +4,19 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
         <include layout="@layout/my_action_bar" />
-
-
-        <include layout="@layout/week_button"
-            android:id="@+id/ll_repeat"/>
-        <View
-            android:background="@color/bgColor_divier"
-            android:layout_width="match_parent"
-            android:layout_height="1px"></View>
+        <include layout="@layout/week_button"/>
+        <include layout="@layout/horizontal_line"/>
         <include layout="@layout/preference_tone"/>
-        <View
-            android:background="@color/bgColor_divier"
-            android:layout_width="match_parent"
-            android:layout_height="1px"></View>
+        <include layout="@layout/horizontal_line"/>
         <include layout="@layout/preference_shake"/>
-        <View
-            android:background="@color/bgColor_divier"
-            android:layout_width="match_parent"
-            android:layout_height="1px"></View>
+        <include layout="@layout/horizontal_line"/>
         <include layout="@layout/preference_remark" />
-
-        <View
-            android:background="@color/bgColor_divier"
-            android:layout_width="match_parent"
-            android:layout_height="1px"></View>
+        <include layout="@layout/horizontal_line"/>
         <include layout="@layout/time_picker"/>
     </LinearLayout>
 </ScrollView>

@@ -1,36 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
 <RelativeLayout
-    android:layout_width="wrap_content"
-    android:layout_height="65dp"
-    android:paddingLeft="20dp"
-    android:id="@+id/week_relative_layout"
-    android:layout_toLeftOf="@+id/repeat_image"
-    android:layout_alignParentLeft="true">
-    <TextView
-        android:id="@+id/textView3"
-        android:paddingTop="10dp"
-        android:textAppearance="?attr/textAppearanceListItem"
-        android:layout_width="wrap_content"
-        android:layout_height="30dp"
-        android:text="重复"/>
-    <TextView
-        android:id="@+id/tv_repeat"
-        android:layout_below="@+id/textView3"
-        android:paddingTop="5dp"
-        android:layout_width="wrap_content"
-        android:layout_height="25dp"
-        android:text="只响一次"/>
+    android:id="@+id/ll_repeat"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-</RelativeLayout>
-<android.support.v7.widget.AppCompatImageView
-    app:srcCompat="@drawable/ic_right_arrow"
-    android:id="@+id/repeat_image"
-    android:layout_width="wrap_content"
-    android:layout_height="65dp"
-    android:paddingEnd="20dp"
-    android:layout_alignParentRight="true" />
+    <RelativeLayout
+        android:id="@+id/week_relative_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="65dp"
+        android:layout_alignParentLeft="true"
+        android:layout_toLeftOf="@+id/repeat_image"
+        android:paddingLeft="20dp">
+
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:paddingTop="10dp"
+            android:text="重复"
+            android:textAppearance="?attr/textAppearanceListItem"/>
+
+        <TextView
+            android:id="@+id/tv_repeat"
+            android:layout_width="wrap_content"
+            android:layout_height="25dp"
+            android:layout_below="@+id/textView3"
+            android:paddingTop="5dp"
+            android:text="只响一次"/>
+
+    </RelativeLayout>
+
+    <android.support.v7.widget.AppCompatImageView
+        android:id="@+id/repeat_image"
+        android:layout_width="wrap_content"
+        android:layout_height="65dp"
+        android:layout_alignParentRight="true"
+        android:paddingEnd="20dp"
+        app:srcCompat="@drawable/ic_right_arrow"/>
 </RelativeLayout>

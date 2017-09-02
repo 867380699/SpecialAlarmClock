@@ -64,10 +64,12 @@ public class AlarmAlertActivity extends AppCompatActivity{
                         break;
                     case TelephonyManager.CALL_STATE_IDLE:
                         Log.d(getClass().getSimpleName(), "Call State Idle");
-                        try {
-                            mediaPlayer.start();
-                        } catch (IllegalStateException e) {
-
+                        if (mediaPlayer!=null){
+                            try {
+                                mediaPlayer.start();
+                            } catch (IllegalStateException e) {
+                                e.printStackTrace();
+                            }
                         }
                         break;
                 }
@@ -85,7 +87,7 @@ public class AlarmAlertActivity extends AppCompatActivity{
             public void onDone() {
                 AlarmServiceBroadcastReceiver receiver = new AlarmServiceBroadcastReceiver();
                 receiver.cancelAlarm(AlarmAlertActivity.this);
-                ReleaseRelease();
+                releaseRelease();
                 finishAffinity();
             }
         });
@@ -115,6 +117,7 @@ public class AlarmAlertActivity extends AppCompatActivity{
 
             } catch (Exception e) {
                 mediaPlayer.release();
+                mediaPlayer = null;
                 alarmActive = false;
             }
         }
@@ -137,9 +140,11 @@ public class AlarmAlertActivity extends AppCompatActivity{
         StaticWakeLock.lockOff(this);
     }
 
-    protected void ReleaseRelease() {
+    protected void releaseRelease() {
         if (mediaPlayer != null) {
-            mediaPlayer.stop();
+            if(mediaPlayer.isPlaying()){
+                mediaPlayer.stop();
+            }
             mediaPlayer.release();
             mediaPlayer = null;
             finish();
@@ -154,15 +159,13 @@ public class AlarmAlertActivity extends AppCompatActivity{
         } catch (Exception e) {
             e.printStackTrace();
         }
-        try {
-            mediaPlayer.stop();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        try {
-            mediaPlayer.release();
-        } catch (Exception e) {
-            e.printStackTrace();
+        if(mediaPlayer!=null) {
+            try {
+                mediaPlayer.stop();
+                mediaPlayer.release();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         super.onDestroy();
     }

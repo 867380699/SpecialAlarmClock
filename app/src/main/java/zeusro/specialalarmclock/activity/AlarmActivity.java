@@ -1,7 +1,9 @@
 package zeusro.specialalarmclock.activity;
 
+import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
+import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
@@ -19,7 +21,6 @@ import android.widget.Toast;
 
 import com.kyleduo.switchbutton.SwitchButton;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -28,19 +29,21 @@ import zeusro.specialalarmclock.Database;
 import zeusro.specialalarmclock.R;
 import zeusro.specialalarmclock.adapter.AlarmListAdapter;
 import zeusro.specialalarmclock.bean.Alarm;
+import zeusro.specialalarmclock.receiver.AlarmServiceBroadcastReceiver;
 import zeusro.specialalarmclock.receiver.NotificationWakeUpReceiver;
 import zeusro.specialalarmclock.repository.HolidayRepository;
+import zeusro.specialalarmclock.utils.DateTimeUtils;
 import zeusro.specialalarmclock.utils.ToastUtils;
 
 /**
  * 主activity
  */
 public class AlarmActivity extends BaseActivity implements View.OnClickListener{
-
-    AlarmListAdapter alarmListAdapter;
-    ListView lvAlarm;
-    ImageButton btnAdd;
-    ImageButton btnSetting;
+    public static final String TAG = "AlarmActivity";
+    private AlarmListAdapter alarmListAdapter;
+    private ListView lvAlarm;
+    private ImageButton btnAdd;
+    private ImageButton btnSetting;
     private boolean isExit;
     public final static int notificationId = 1;
     HolidayRepository repository;
@@ -73,6 +76,10 @@ public class AlarmActivity extends BaseActivity implements View.OnClickListener{
     protected void onResume() {
         super.onResume();
         updateAlarmList();
+        if(repository==null){
+            repository = new HolidayRepository(this);
+        }
+        repository.updateHolidayAndWorkday();
     }
 
 
@@ -132,7 +139,6 @@ public class AlarmActivity extends BaseActivity implements View.OnClickListener{
 
     private void initAlarmList() {
         lvAlarm = (ListView) findViewById(R.id.listView);
-        Log.i("的的的的的的的的顶顶顶顶顶   的的的的的的",lvAlarm==null?"是啊":"不是");
         if (lvAlarm != null) {
             lvAlarm.setLongClickable(true);
             lvAlarm.setOnItemLongClickListener(new OnItemLongClickListener() {
@@ -187,29 +193,25 @@ public class AlarmActivity extends BaseActivity implements View.OnClickListener{
             btnSetting.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    CreateNotification(null);
-                    repository.getHolidayFromRemote("2017", new HolidayRepository.Callback() {
-                        @Override
-                        public void onDataLoaded(ArrayList<String> result) {
-                            Toast.makeText(AlarmActivity.this,"holiday: "+ result, Toast.LENGTH_SHORT).show();
-                        }
+                    createNotification(null);
+                    AlarmManager manager = (AlarmManager) getSystemService(ALARM_SERVICE);
+                    long alarmTime = System.currentTimeMillis()+30*1000;
+                    Intent intent = new Intent(AlarmActivity.this, AlarmServiceBroadcastReceiver.class);
+                    intent.setAction("zeusro.action.alert");
+                    intent.putExtra("alarm", 1L);
+                    PendingIntent pi = PendingIntent.getBroadcast(AlarmActivity.this,0,intent,0);
+                    if(Math.random()>0){
+                        manager.setExact(AlarmManager.RTC_WAKEUP,alarmTime,pi);
+                        String s = DateTimeUtils.getFormatDate(alarmTime,"yyyy-MM-dd HH:mm:ss")+" Exact";
+                        ToastUtils.show(s);
+                        Log.i(TAG, "onClick: "+s);
+                    }else{
+                        manager.set(AlarmManager.RTC_WAKEUP,alarmTime,pi);
+                        String s = DateTimeUtils.getFormatDate(alarmTime,"yyyy-MM-dd HH:mm:ss")+" not Exact";
+                        ToastUtils.show(s);
+                        Log.i(TAG, "onClick: "+s);
 
-                        @Override
-                        public void onDataNotAvailable(String result) {
-
-                        }
-                    });
-                    repository.getSpecialWorkingDayFromRemote("2017", new HolidayRepository.Callback() {
-                        @Override
-                        public void onDataLoaded(ArrayList<String> result) {
-                            Toast.makeText(AlarmActivity.this,"workingDay: "+ result, Toast.LENGTH_SHORT).show();
-                        }
-
-                        @Override
-                        public void onDataNotAvailable(String result) {
-
-                        }
-                    });
+                    }
                 }
 
             });
@@ -254,7 +256,7 @@ public class AlarmActivity extends BaseActivity implements View.OnClickListener{
         }
     }
 
-    private void CreateNotification(Alarm alarm) {
+    private void createNotification(Alarm alarm) {
         Intent intent = new Intent();
         intent.setClass(this, NotificationWakeUpReceiver.class);
         sendBroadcast(intent);//发送广播事件
