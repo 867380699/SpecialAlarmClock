@@ -43,6 +43,9 @@ public class AlarmServiceBroadcastReceiver extends WakefulBroadcastReceiver {
             if (alarmId > 0) {
                 Database.init(context);
                 Alarm alarm = Database.getAlarm(alarmId);
+                if(!alarm.isActive()){
+                    return;
+                }
                 switch (alarm.getRepeatType()) {
                     case Alarm.TYPE_ALARM_ONCE:
                     case Alarm.TYPE_EVERYDAY:
@@ -155,6 +158,7 @@ public class AlarmServiceBroadcastReceiver extends WakefulBroadcastReceiver {
         if (Alarm.TYPE_ALARM_ONCE == alarm.getRepeatType()) {
             alarmMgr.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), alarmIntent);
         } else {
+
             alarmMgr.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, alarmIntent);
             //alarmMgr.setExact();
         }

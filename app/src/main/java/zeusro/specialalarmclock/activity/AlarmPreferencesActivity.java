@@ -193,6 +193,7 @@ public class AlarmPreferencesActivity extends BaseActivity  implements View.OnCl
                 public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
                     newAlarmTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
                     newAlarmTime.set(Calendar.MINUTE, minute);
+                    newAlarmTime.set(Calendar.SECOND,0);
                     alarm.setAlarmTime(newAlarmTime);
                     setMathAlarm(alarm);
                     timePicker.setCurrentHour(hourOfDay);
