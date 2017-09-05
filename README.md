@@ -11,18 +11,13 @@
 
 任务          | 进度          |  完成时间
 ------------- | ------------- | -------------
-周期重复闹钟 | - | - 
-开机初始全部闹钟 | - | -
-智能跳过节假日 | - | -
-重制首页界面 | - | - 
-重制设置界面 | - | - 
+周期重复闹钟 | x| - 
+开机初始全部闹钟 | x | -
+智能跳过节假日 | x | -
+重制首页界面 | x | - 
+重制设置界面 | x | - 
 重制闹铃界面 | - | - 
 通知栏提前提示和提前取消 | - | -
-
-
-## todo:
-1. 记录起床时间，
-1. 同步起床记录
 
 ## improve：
 
@@ -48,6 +43,8 @@ http://javatechig.com/android/repeat-alarm-example-in-android
 https://developer.android.com/training/basics/network-ops/connecting.html
 
 https://developer.android.com/training/scheduling/alarms.html
+
+http://gabesechansoftware.com/timers-in-android/
 
 ## License
 
