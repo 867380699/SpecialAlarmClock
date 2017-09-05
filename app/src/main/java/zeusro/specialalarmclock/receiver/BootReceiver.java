@@ -12,10 +12,10 @@ import android.util.Log;
  * @since 2017/8/18 下午2:43
  */
 public class BootReceiver extends BroadcastReceiver {
-
+    public static final String TAG = "BootReceiver";
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.d(this.getClass().getSimpleName(), Thread.currentThread().getStackTrace()[2].getMethodName());
+        Log.d(TAG, "onReceive:");
         if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED")) {
             AlarmServiceBroadcastReceiver alarm = new AlarmServiceBroadcastReceiver();
             alarm.resetAllAlarm(context);

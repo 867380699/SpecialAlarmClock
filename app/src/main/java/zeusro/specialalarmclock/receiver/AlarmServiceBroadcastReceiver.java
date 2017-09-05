@@ -35,7 +35,7 @@ public class AlarmServiceBroadcastReceiver extends WakefulBroadcastReceiver {
         if (alarmId > 0) {
             Database.init(context);
             Alarm alarm = Database.getAlarm(alarmId);
-            if(!alarm.isActive()){
+            if(alarm==null || !alarm.isActive()){
                 return;
             }
             HolidayRepository repository = new HolidayRepository();
@@ -68,7 +68,7 @@ public class AlarmServiceBroadcastReceiver extends WakefulBroadcastReceiver {
             if(alarm.getRepeatType()!=Alarm.TYPE_ALARM_ONCE){
                 alarm.setAlarmTime(alarm.getAlarmTime()+ DateTimeUtils.DAY);
                 AlarmManager alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-                alarmMgr.set(AlarmManager.RTC_WAKEUP, alarm.getAlarmTime(), alarmIntent);
+                alarmMgr.setExact(AlarmManager.RTC_WAKEUP, alarm.getAlarmTime(), alarmIntent);
             }
         }
     }

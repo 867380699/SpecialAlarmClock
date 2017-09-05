@@ -1,5 +1,7 @@
 # 极简闹钟/SpecialAlarmClock
 
+原始代码地址: https://github.com/zeusro/SpecialAlarmClock
+
 - 自制的Android闹钟
 - 简单设置周期.
 - 点击XX后提前停止闹钟,并且记录停止时间
