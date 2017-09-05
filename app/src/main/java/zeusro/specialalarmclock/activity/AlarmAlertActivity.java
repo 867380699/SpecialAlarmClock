@@ -87,8 +87,8 @@ public class AlarmAlertActivity extends AppCompatActivity{
             public void onDone() {
                 AlarmServiceBroadcastReceiver receiver = new AlarmServiceBroadcastReceiver();
                 receiver.cancelAlarm(AlarmAlertActivity.this);
-                releaseRelease();
-                finishAffinity();
+                releaseResources();
+                finish();
             }
         });
     }
@@ -140,7 +140,7 @@ public class AlarmAlertActivity extends AppCompatActivity{
         StaticWakeLock.lockOff(this);
     }
 
-    protected void releaseRelease() {
+    protected void releaseResources() {
         if (mediaPlayer != null) {
             if(mediaPlayer.isPlaying()){
                 mediaPlayer.stop();

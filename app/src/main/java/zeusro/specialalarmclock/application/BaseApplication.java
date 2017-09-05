@@ -2,8 +2,12 @@ package zeusro.specialalarmclock.application;
 
 import android.app.Activity;
 import android.app.Application;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+
+import zeusro.specialalarmclock.receiver.BootReceiver;
 
 /**
  *
@@ -27,6 +31,7 @@ public class BaseApplication extends Application {
         super.onCreate();
         this.context=getApplicationContext();
         self = this;
+        enableBootReceiver();
         this.registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks(){
 
             @Override
@@ -65,6 +70,19 @@ public class BaseApplication extends Application {
             }
         });
     }
+
+    @Override
+    public void onTerminate() {
+        super.onTerminate();
+        enableBootReceiver();
+    }
+
+    private void enableBootReceiver(){
+        ComponentName receiver = new ComponentName(getApplicationContext(), BootReceiver.class);
+        PackageManager pm = getApplicationContext().getPackageManager();
+        pm.setComponentEnabledSetting(receiver, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
+    }
+
     public static BaseApplication getInstance(){
         return self;
     }

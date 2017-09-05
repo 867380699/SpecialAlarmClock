@@ -1,9 +1,7 @@
 package zeusro.specialalarmclock.activity;
 
-import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
-import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
@@ -29,10 +27,8 @@ import zeusro.specialalarmclock.Database;
 import zeusro.specialalarmclock.R;
 import zeusro.specialalarmclock.adapter.AlarmListAdapter;
 import zeusro.specialalarmclock.bean.Alarm;
-import zeusro.specialalarmclock.receiver.AlarmServiceBroadcastReceiver;
 import zeusro.specialalarmclock.receiver.NotificationWakeUpReceiver;
 import zeusro.specialalarmclock.repository.HolidayRepository;
-import zeusro.specialalarmclock.utils.DateTimeUtils;
 import zeusro.specialalarmclock.utils.ToastUtils;
 
 /**
@@ -46,7 +42,8 @@ public class AlarmActivity extends BaseActivity implements View.OnClickListener{
     private ImageButton btnSetting;
     private boolean isExit;
     public final static int notificationId = 1;
-    HolidayRepository repository;
+    private HolidayRepository repository;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,6 +52,7 @@ public class AlarmActivity extends BaseActivity implements View.OnClickListener{
         repository = new HolidayRepository(this);
         initView();
     }
+
     private void initView() {
         ActionBar actionBar = getSupportActionBar();
         if(actionBar!=null){
@@ -194,24 +192,6 @@ public class AlarmActivity extends BaseActivity implements View.OnClickListener{
                 @Override
                 public void onClick(View v) {
                     createNotification(null);
-                    AlarmManager manager = (AlarmManager) getSystemService(ALARM_SERVICE);
-                    long alarmTime = System.currentTimeMillis()+30*1000;
-                    Intent intent = new Intent(AlarmActivity.this, AlarmServiceBroadcastReceiver.class);
-                    intent.setAction("zeusro.action.alert");
-                    intent.putExtra("alarm", 1L);
-                    PendingIntent pi = PendingIntent.getBroadcast(AlarmActivity.this,0,intent,0);
-                    if(Math.random()>0){
-                        manager.setExact(AlarmManager.RTC_WAKEUP,alarmTime,pi);
-                        String s = DateTimeUtils.getFormatDate(alarmTime,"yyyy-MM-dd HH:mm:ss")+" Exact";
-                        ToastUtils.show(s);
-                        Log.i(TAG, "onClick: "+s);
-                    }else{
-                        manager.set(AlarmManager.RTC_WAKEUP,alarmTime,pi);
-                        String s = DateTimeUtils.getFormatDate(alarmTime,"yyyy-MM-dd HH:mm:ss")+" not Exact";
-                        ToastUtils.show(s);
-                        Log.i(TAG, "onClick: "+s);
-
-                    }
                 }
 
             });

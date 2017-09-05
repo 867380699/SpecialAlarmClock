@@ -28,6 +28,7 @@ import java.util.Calendar;
 import zeusro.specialalarmclock.Database;
 import zeusro.specialalarmclock.R;
 import zeusro.specialalarmclock.bean.Alarm;
+import zeusro.specialalarmclock.utils.DateTimeUtils;
 import zeusro.specialalarmclock.utils.TimePickerUtils;
 import zeusro.specialalarmclock.utils.ToastUtils;
 
@@ -43,16 +44,19 @@ public class AlarmPreferencesActivity extends BaseActivity  implements View.OnCl
     private EditText etName;
     private InputMethodManager imm;
     private TextView editRemarkText;
+    private AlarmPreferencesActivity self;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.preferences);
+        self = this;
         Bundle bundle = getIntent().getExtras();
         if (bundle != null && bundle.containsKey(KEY_ALARM)) {
             alarm = ((Alarm) bundle.getSerializable(KEY_ALARM));
         } else {
             alarm = new Alarm();
-            alarm.getAlarmTime().set(Calendar.MINUTE,Calendar.getInstance().get(Calendar.MINUTE) + 1);
+            alarm.setAlarmTime(alarm.getAlarmTime()+ DateTimeUtils.MINUTE);
         }
         getSupportActionBar().hide();
         initRingtonePicker();
@@ -92,7 +96,7 @@ public class AlarmPreferencesActivity extends BaseActivity  implements View.OnCl
         findViewById(R.id.ll_ring).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                RingtonePickerDialog.Builder ringtonePickerBuilder = new RingtonePickerDialog.Builder(AlarmPreferencesActivity.this, getSupportFragmentManager());
+                RingtonePickerDialog.Builder ringtonePickerBuilder = new RingtonePickerDialog.Builder(self, getSupportFragmentManager());
                 ringtonePickerBuilder.setTitle("铃声");
 
                 //Add the desirable ringtone types.
@@ -154,7 +158,7 @@ public class AlarmPreferencesActivity extends BaseActivity  implements View.OnCl
         rlRepeat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(AlarmPreferencesActivity.this);
+                AlertDialog.Builder builder = new AlertDialog.Builder(self);
                 builder.setItems(Alarm.getRepeatTypeArray(), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -176,8 +180,10 @@ public class AlarmPreferencesActivity extends BaseActivity  implements View.OnCl
 
     private void initTimePicker() {
         timePicker = (TimePicker) findViewById(R.id.timePicker);
-        int oldHour = alarm.getAlarmTime().get(Calendar.HOUR_OF_DAY);
-        int oldMinute = alarm.getAlarmTime().get(Calendar.MINUTE);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(alarm.getAlarmTime());
+        int oldHour = calendar.get(Calendar.HOUR_OF_DAY);
+        int oldMinute = calendar.get(Calendar.MINUTE);
         timePicker.setCurrentHour(oldHour);
         timePicker.setCurrentMinute(oldMinute);
         timePicker.setIs24HourView(true);
@@ -194,7 +200,7 @@ public class AlarmPreferencesActivity extends BaseActivity  implements View.OnCl
                     newAlarmTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
                     newAlarmTime.set(Calendar.MINUTE, minute);
                     newAlarmTime.set(Calendar.SECOND,0);
-                    alarm.setAlarmTime(newAlarmTime);
+                    alarm.setAlarmTime(newAlarmTime.getTimeInMillis());
                     setMathAlarm(alarm);
                     timePicker.setCurrentHour(hourOfDay);
                     timePicker.setCurrentMinute(minute);
@@ -213,12 +219,6 @@ public class AlarmPreferencesActivity extends BaseActivity  implements View.OnCl
     public void onBackPressed() {
         super.onBackPressed();
         finish();
-        //跨activity传值,用于测试
-//        Intent resultIntent = new Intent();
-//        Bundle bundle = new Bundle();
-//        bundle.putSerializable("object", alarm);
-//        resultIntent.putExtras(bundle);
-//        setResult(RESULT_OK, resultIntent);
     }
 
     @Override

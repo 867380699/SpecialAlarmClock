@@ -18,7 +18,7 @@ public class BootReceiver extends BroadcastReceiver {
         Log.d(this.getClass().getSimpleName(), Thread.currentThread().getStackTrace()[2].getMethodName());
         if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED")) {
             AlarmServiceBroadcastReceiver alarm = new AlarmServiceBroadcastReceiver();
-            alarm.setAllAlarm(context);
+            alarm.resetAllAlarm(context);
         }
     }
 }

@@ -7,9 +7,12 @@ import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
 import android.support.v4.util.ArraySet;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 import java.util.Set;
 
 import zeusro.specialalarmclock.application.BaseApplication;
@@ -179,7 +182,7 @@ public class HolidayRepository {
     public void getSpecialWorkday(final Callback callback){
         SharedPreferences pref = context.getSharedPreferences(SP_NAME, Context.MODE_PRIVATE);
         long saveTime = pref.getLong(SP_KEY_WORKDAY_UPDATE_TIME,0);
-        if(System.currentTimeMillis()-saveTime< DateTimeUtils.DAY_IN_MILISECOND){
+        if(System.currentTimeMillis()-saveTime< DateTimeUtils.DAY){
             Set<String> workdaySet =  pref.getStringSet(SP_KEY_WORKING_DAY,null);
             if(workdaySet!=null){
                 callback.onDataLoaded(new ArrayList<>(workdaySet));
@@ -229,10 +232,10 @@ public class HolidayRepository {
             long current = System.currentTimeMillis();
             long lastWorkdayUpdateTime = pref.getLong(SP_KEY_WORKDAY_UPDATE_TIME,current);
             long lastHolidayUpdateTime = pref.getLong(SP_KEY_HOLIDAY_UPDATE_TIME,current);
-            if(current-lastHolidayUpdateTime>DateTimeUtils.DAY_IN_MILISECOND){
+            if(current-lastHolidayUpdateTime>DateTimeUtils.DAY){
                 getHolidayFromRemote(year,null);
             }
-            if(current-lastWorkdayUpdateTime>DateTimeUtils.DAY_IN_MILISECOND){
+            if(current-lastWorkdayUpdateTime>DateTimeUtils.DAY){
                 getSpecialWorkingDayFromRemote(year,null);
             }
         }
@@ -240,5 +243,54 @@ public class HolidayRepository {
 
     public void updateHolidayAndWorkday(){
         updateHolidayAndWorkday(false);
+    }
+
+    public boolean isTodayCommonWorkday() {
+        int todayInWeek = Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
+        return !(todayInWeek == Calendar.SATURDAY || todayInWeek == Calendar.SUNDAY);
+    }
+
+    public boolean isTodayHoliday(){
+        Date current = Calendar.getInstance().getTime();
+        String today = new SimpleDateFormat("MMdd", Locale.CHINA).format(current);
+        // 法定节假日一定是假日
+        ArrayList<String> holidays = loadHolidayFromLocal();
+        for (String holiday : holidays) {
+            if(holiday.equals(today)){
+                return true;
+            }
+        }
+        // 特殊工作日一定不是假日
+        ArrayList<String> specialWorkdays = loadSpecialWorkingDayFromLocal();
+        for (String workday : specialWorkdays) {
+            if (workday.equals(today)) {
+                return false;
+            }
+        }
+        // 其他
+        int todayInWeek = Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
+        return (todayInWeek == Calendar.SATURDAY || todayInWeek == Calendar.SUNDAY);
+    }
+
+    public boolean isTodayWorkday() {
+        Date current = Calendar.getInstance().getTime();
+        String today = new SimpleDateFormat("MMdd", Locale.CHINA).format(current);
+        // 特殊工作日一定是工作日
+        ArrayList<String> specialWorkdays = loadSpecialWorkingDayFromLocal();
+        for (String workday : specialWorkdays) {
+            if (workday.equals(today)) {
+                return true;
+            }
+        }
+        // 法定假日一定不是工作日
+        ArrayList<String> holidays = loadHolidayFromLocal();
+        for (String holiday : holidays) {
+            if(holiday.equals(today)){
+                return false;
+            }
+        }
+        // 其他
+        int todayInWeek = Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
+        return !(todayInWeek == Calendar.SATURDAY || todayInWeek == Calendar.SUNDAY);
     }
 }

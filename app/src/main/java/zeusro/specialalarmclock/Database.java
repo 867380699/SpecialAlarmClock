@@ -65,8 +65,9 @@ public class Database extends SQLiteOpenHelper {
         if(oldVersion<2){
             String sql = String.format("ALTER TABLE %s ADD COLUMN %s INTEGER DEFAULT 0",ALARM_TABLE,COLUMN_ALARM_REPEAT_TYPE);
             db.execSQL(sql);
-        }if(oldVersion<3){
-                String sql = String.format("ALTER TABLE %s ADD COLUMN %s %s DEFAULT 0",ALARM_TABLE,COLUMN_ALARM_TONE_NAME,"TEXT");
+        }
+        if(oldVersion<3){
+            String sql = String.format("ALTER TABLE %s ADD COLUMN %s %s DEFAULT 0",ALARM_TABLE,COLUMN_ALARM_TONE_NAME,"TEXT");
             db.execSQL(sql);
         }
     }
