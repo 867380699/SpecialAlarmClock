@@ -3,28 +3,34 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:slider="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="@drawable/alert_background"
     tools:context=".activity.AlarmAlertActivity">
 
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="top"
-        android:text="@string/AlertText"
-        android:textAppearance="?android:attr/textAppearanceLarge"/>
+
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         >
+            <at.markushi.ui.CircleButton
+                android:id="@+id/circle_button"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:src="@drawable/alarm_delay"
+                app:cb_color="#F7E9D5"
+                app:cb_pressedRingWidth="8dip"
+                android:layout_above="@+id/slider"
+                android:layout_centerHorizontal="true" />
+
         <!--todo 滑块的长度要通过代码动态设置 slidableLength-->
         <zeusro.specialalarmclock.view.SlideView
             android:id="@+id/slider"
             android:layout_width="match_parent"
-            android:layout_height="96dp"
+            android:layout_height="84dp"
             android:layout_alignParentBottom="true"
             android:layout_centerInParent="true"
             android:background="@mipmap/slideviewbg"
