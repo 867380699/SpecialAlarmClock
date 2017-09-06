@@ -150,4 +150,16 @@ public class AlarmServiceBroadcastReceiver extends WakefulBroadcastReceiver {
         AlarmManager alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         alarmMgr.cancel(alarmIntent);
     }
+
+    public void delayAlarm(Context context,Alarm alarm){
+        if (alarmIntent == null) {
+            Intent intent = new Intent(context, AlarmServiceBroadcastReceiver.class);
+            intent.setAction(Constants.ACTION_ALARM);
+            intent.putExtra("alarm", alarm.getId());
+            intent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
+            alarmIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        }
+        AlarmManager alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        alarmMgr.setExact(AlarmManager.RTC_WAKEUP, new java.util.Date().getTime()+10*1000*60, alarmIntent);
+    }
 }

@@ -10,12 +10,18 @@ import android.support.v7.app.AppCompatActivity;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 
+import java.sql.Date;
+import java.util.Calendar;
+
+import at.markushi.ui.CircleButton;
 import zeusro.specialalarmclock.R;
 import zeusro.specialalarmclock.StaticWakeLock;
 import zeusro.specialalarmclock.bean.Alarm;
 import zeusro.specialalarmclock.receiver.AlarmServiceBroadcastReceiver;
+import zeusro.specialalarmclock.utils.ToastUtils;
 import zeusro.specialalarmclock.view.SlideView;
 
 /**
@@ -24,17 +30,20 @@ import zeusro.specialalarmclock.view.SlideView;
  * @author lls
  * @since 2017/8/18 下午3:47
  */
-public class AlarmAlertActivity extends AppCompatActivity{
+public class AlarmAlertActivity extends AppCompatActivity implements View.OnClickListener{
     private Alarm alarm;
     private MediaPlayer mediaPlayer;
     private Vibrator vibrator;
     private boolean alarmActive;
     private TextView textView;
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.alert);
+        getSupportActionBar().hide();
         Bundle bundle = this.getIntent().getExtras();
         if (bundle != null) {
             alarm = (Alarm) bundle.getSerializable("alarm");
@@ -43,10 +52,12 @@ public class AlarmAlertActivity extends AppCompatActivity{
                 startAlarm();
             }
         }
-        textView = (TextView) findViewById(R.id.textView2);
-        textView.setText(alarm.toString());
+//        textView = (TextView) findViewById(R.id.textView2);
+//        textView.setText(alarm.toString());
         setSlideView();
         setTelephonyStateChangedListener();
+        CircleButton cb= (CircleButton) findViewById(R.id.circle_button);
+        cb.setOnClickListener(this);
     }
 
     private void setTelephonyStateChangedListener() {
@@ -168,5 +179,23 @@ public class AlarmAlertActivity extends AppCompatActivity{
             }
         }
         super.onDestroy();
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+
+            case R.id.circle_button:{
+                AlarmServiceBroadcastReceiver receiver = new AlarmServiceBroadcastReceiver();
+                receiver.delayAlarm(AlarmAlertActivity.this,alarm);
+                ToastUtils.show("10分钟后再响");
+                releaseResources();
+                finish();
+                break;
+            }
+            default:{
+                break;
+            }
+        }
     }
 }
