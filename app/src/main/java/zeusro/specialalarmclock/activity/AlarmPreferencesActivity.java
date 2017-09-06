@@ -32,14 +32,17 @@ import zeusro.specialalarmclock.utils.DateTimeUtils;
 import zeusro.specialalarmclock.utils.TimePickerUtils;
 import zeusro.specialalarmclock.utils.ToastUtils;
 
+/**
+ * 设置闹钟的界面
+ *
+ * @author lls
+ * @since 2017/9/6 上午10:59
+ */
 public class AlarmPreferencesActivity extends BaseActivity  implements View.OnClickListener, OnItemClickListener{
     public static final String TAG = "AlarmPreferences";
     public static final String KEY_ALARM = "alarm";
     private Alarm alarm;
     private TimePicker timePicker;
-    private Button cancelBtn;
-    private Button saveAlarmBtn;
-    private RelativeLayout editRemark;
     private AlertView mAlertViewExt;
     private EditText etName;
     private InputMethodManager imm;
@@ -56,7 +59,7 @@ public class AlarmPreferencesActivity extends BaseActivity  implements View.OnCl
             alarm = ((Alarm) bundle.getSerializable(KEY_ALARM));
         } else {
             alarm = new Alarm();
-            alarm.setAlarmTime(alarm.getAlarmTime()+ DateTimeUtils.MINUTE);
+            alarm.setAlarmTime(System.currentTimeMillis()+ DateTimeUtils.MINUTE);
         }
         getSupportActionBar().hide();
         initRingtonePicker();
@@ -69,7 +72,7 @@ public class AlarmPreferencesActivity extends BaseActivity  implements View.OnCl
     }
 
     private void initEditRemark() {
-        editRemark=(RelativeLayout)findViewById(R.id.remark_relative_layout);
+        RelativeLayout editRemark = (RelativeLayout) findViewById(R.id.remark_relative_layout);
         editRemarkText=(TextView)findViewById(R.id.remark_text_secondary);
         editRemarkText.setText(alarm.getAlarmName());
         editRemark.setOnClickListener(this);
@@ -81,8 +84,8 @@ public class AlarmPreferencesActivity extends BaseActivity  implements View.OnCl
     }
 
     private void initToolBarBtn() {
-        cancelBtn= (Button) findViewById(R.id.cancel_alarm);
-        saveAlarmBtn=(Button)findViewById(R.id.save_alarm);
+        Button cancelBtn = (Button) findViewById(R.id.cancel_alarm);
+        Button saveAlarmBtn = (Button) findViewById(R.id.save_alarm);
         cancelBtn.setOnClickListener(this);
         saveAlarmBtn.setOnClickListener(this);
     }
@@ -182,16 +185,14 @@ public class AlarmPreferencesActivity extends BaseActivity  implements View.OnCl
         timePicker = (TimePicker) findViewById(R.id.timePicker);
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(alarm.getAlarmTime());
+        timePicker.setIs24HourView(true);
         int oldHour = calendar.get(Calendar.HOUR_OF_DAY);
         int oldMinute = calendar.get(Calendar.MINUTE);
         timePicker.setCurrentHour(oldHour);
         timePicker.setCurrentMinute(oldMinute);
-        timePicker.setIs24HourView(true);
         TimePickerUtils.setTimerPickerStyle(timePicker);
         final Calendar newAlarmTime = Calendar.getInstance();
-//        newAlarmTime.set(Calendar.HOUR_OF_DAY, Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
-//        newAlarmTime.set(Calendar.MINUTE, Calendar.getInstance().get(Calendar.MINUTE) + 1);
-//        alarm.setAlarmTime(newAlarmTime);
+        newAlarmTime.setTimeInMillis(calendar.getTimeInMillis());
 
         if (timePicker != null) {
             timePicker.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
@@ -200,6 +201,7 @@ public class AlarmPreferencesActivity extends BaseActivity  implements View.OnCl
                     newAlarmTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
                     newAlarmTime.set(Calendar.MINUTE, minute);
                     newAlarmTime.set(Calendar.SECOND,0);
+                    newAlarmTime.set(Calendar.MILLISECOND,0);
                     alarm.setAlarmTime(newAlarmTime.getTimeInMillis());
                     setMathAlarm(alarm);
                     timePicker.setCurrentHour(hourOfDay);

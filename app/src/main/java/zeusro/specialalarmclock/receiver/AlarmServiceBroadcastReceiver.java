@@ -5,6 +5,7 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.support.v4.content.WakefulBroadcastReceiver;
 import android.util.Log;
 
@@ -35,7 +36,7 @@ public class AlarmServiceBroadcastReceiver extends WakefulBroadcastReceiver {
         if (alarmId > 0) {
             Database.init(context);
             Alarm alarm = Database.getAlarm(alarmId);
-            if(alarm==null || !alarm.isActive()){
+            if (alarm == null || !alarm.isActive()) {
                 return;
             }
             HolidayRepository repository = new HolidayRepository();
@@ -45,17 +46,17 @@ public class AlarmServiceBroadcastReceiver extends WakefulBroadcastReceiver {
                     showAlarm(context, alarm);
                     break;
                 case Alarm.TYPE_ALARM_WORKDAY:
-                    if (repository.isTodayWorkday()){
+                    if (repository.isTodayWorkday()) {
                         showAlarm(context, alarm);
                     }
                     break;
                 case Alarm.TYPE_ALARM_HOLIDAY:
-                    if(repository.isTodayHoliday()){
+                    if (repository.isTodayHoliday()) {
                         showAlarm(context, alarm);
                     }
                     break;
                 case Alarm.TYPE_ALARM_MON_TO_FRI:
-                    if(repository.isTodayCommonWorkday()){
+                    if (repository.isTodayCommonWorkday()) {
                         showAlarm(context, alarm);
                     }
                     break;
@@ -65,10 +66,9 @@ public class AlarmServiceBroadcastReceiver extends WakefulBroadcastReceiver {
                     break;
             }
             // 如果是重复的闹钟，重新设置次日闹钟
-            if(alarm.getRepeatType()!=Alarm.TYPE_ALARM_ONCE){
-                alarm.setAlarmTime(alarm.getAlarmTime()+ DateTimeUtils.DAY);
-                AlarmManager alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-                alarmMgr.setExact(AlarmManager.RTC_WAKEUP, alarm.getAlarmTime(), alarmIntent);
+            if (alarm.getRepeatType() != Alarm.TYPE_ALARM_ONCE) {
+                alarm.setAlarmTime(alarm.getAlarmTime() + DateTimeUtils.DAY);
+                setAlarm(context,alarm);
             }
         }
     }
@@ -95,7 +95,11 @@ public class AlarmServiceBroadcastReceiver extends WakefulBroadcastReceiver {
         System.out.println("set id: " + alarm.getId());
         alarmIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        alarmMgr.setExact(AlarmManager.RTC_WAKEUP, alarm.getAlarmTime(), alarmIntent);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            alarmMgr.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, alarm.getAlarmTime(), alarmIntent);
+        } else {
+            alarmMgr.setExact(AlarmManager.RTC_WAKEUP, alarm.getAlarmTime(), alarmIntent);
+        }
     }
 
     /**
@@ -109,24 +113,24 @@ public class AlarmServiceBroadcastReceiver extends WakefulBroadcastReceiver {
         Calendar calendarAlarm = Calendar.getInstance();
         for (Alarm alarm : alarms) {
             calendarAlarm.setTimeInMillis(System.currentTimeMillis());
-            calendarAlarm.set(Calendar.SECOND,0);
-            calendarAlarm.set(Calendar.MILLISECOND,0);
+            calendarAlarm.set(Calendar.SECOND, 0);
+            calendarAlarm.set(Calendar.MILLISECOND, 0);
             if (alarm.isActive()) {
                 Calendar ca = Calendar.getInstance();
                 ca.setTimeInMillis(alarm.getAlarmTime());
-                calendarAlarm.set(Calendar.HOUR_OF_DAY,ca.get(Calendar.HOUR_OF_DAY));
-                calendarAlarm.set(Calendar.MINUTE,ca.get(Calendar.MINUTE));
-                if(calendarAlarm.getTimeInMillis()>=System.currentTimeMillis()){
+                calendarAlarm.set(Calendar.HOUR_OF_DAY, ca.get(Calendar.HOUR_OF_DAY));
+                calendarAlarm.set(Calendar.MINUTE, ca.get(Calendar.MINUTE));
+                if (calendarAlarm.getTimeInMillis() >= System.currentTimeMillis()) {
                     alarm.setAlarmTime(calendarAlarm.getTimeInMillis());
-                    setAlarm(context,alarm);
-                }else{
-                    if(alarm.getRepeatType() == Alarm.TYPE_ALARM_ONCE){
+                    setAlarm(context, alarm);
+                } else {
+                    if (alarm.getRepeatType() == Alarm.TYPE_ALARM_ONCE) {
                         alarm.setActive(false);
                         Database.update(alarm);
-                    }else{
-                        calendarAlarm.add(Calendar.DAY_OF_YEAR,1);
+                    } else {
+                        calendarAlarm.add(Calendar.DAY_OF_YEAR, 1);
                         alarm.setAlarmTime(calendarAlarm.getTimeInMillis());
-                        setAlarm(context,alarm);
+                        setAlarm(context, alarm);
                     }
                 }
             }

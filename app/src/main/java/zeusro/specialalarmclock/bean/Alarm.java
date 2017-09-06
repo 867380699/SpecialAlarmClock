@@ -95,13 +95,6 @@ public class Alarm implements Serializable {
     }
 
     /**
-     * @param alarmTime the alarmTime to set
-     */
-    public void setAlarmTime(String alarmTime) {
-        setAlarmTime(DateTimeUtils.getDateFromString(alarmTime,"HH:mm"));
-    }
-
-    /**
      * @return the repeatDays
      */
     public int[] getDays() {
@@ -218,6 +211,7 @@ public class Alarm implements Serializable {
         return "Alarm{" +
                 "id=" + id +
                 ", isActive=" + isActive +
+                ", alarmTimeMillisecond=" + alarmTime +
                 ", alarmTime=" + DateTimeUtils.getFormatDate(alarmTime, "yyyy-MM-dd HH:mm:ss") +
                 ", repeatType=" + repeatType +
                 ", days=" + Arrays.toString(days) +
