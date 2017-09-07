@@ -33,7 +33,8 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".activity.AlarmAlertActivity">
+        <activity android:name=".activity.AlarmAlertActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen">
         </activity>
         <activity android:name=".activity.AlarmPreferencesActivity">
         </activity>

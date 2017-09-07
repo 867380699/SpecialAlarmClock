@@ -13,9 +13,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
-import java.sql.Date;
-import java.util.Calendar;
-
 import at.markushi.ui.CircleButton;
 import zeusro.specialalarmclock.R;
 import zeusro.specialalarmclock.StaticWakeLock;
@@ -43,7 +40,6 @@ public class AlarmAlertActivity extends AppCompatActivity implements View.OnClic
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.alert);
-        getSupportActionBar().hide();
         Bundle bundle = this.getIntent().getExtras();
         if (bundle != null) {
             alarm = (Alarm) bundle.getSerializable("alarm");

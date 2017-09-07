@@ -2,6 +2,7 @@ package zeusro.specialalarmclock.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -27,7 +28,7 @@ import zeusro.specialalarmclock.repository.HolidayRepository;
 public class AlarmActivity extends BaseActivity{
     public static final String TAG = "AlarmActivity";
     private ImageButton btnAdd;
-    private ImageButton btnSetting;
+    private FloatingActionButton btnSetting;
     private boolean isExit;
     public final static int notificationId = 1;
     private HolidayRepository repository;
@@ -121,10 +122,21 @@ public class AlarmActivity extends BaseActivity{
             }
         });
         rcvAlarm.setAdapter(adapter);
+        rcvAlarm.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if(dy>0 && btnSetting.isShown()){
+                    btnSetting.hide();
+                }else if(dy<0 && !btnSetting.isShown()){
+                    btnSetting.show();
+                }
+            }
+        });
     }
 
     private void initSettingButton() {
-        btnSetting = (ImageButton) findViewById(R.id.fab_setting);
+        btnSetting = (FloatingActionButton) findViewById(R.id.fab_setting);
         if (btnSetting != null) {
             btnSetting.setOnClickListener(new View.OnClickListener() {
                 @Override
