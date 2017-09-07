@@ -23,3 +23,6 @@ On Android 3.1+, no. Once the user has force-stopped your application, you will 
 ---
 
 >https://stackoverflow.com/questions/40480355/pass-serializable-object-to-pending-intent
+
+# Style
+>https://stackoverflow.com/questions/43511326/android-making-activity-full-screen-with-status-bar-on-top-of-it
