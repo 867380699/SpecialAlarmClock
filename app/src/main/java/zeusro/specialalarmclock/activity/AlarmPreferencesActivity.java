@@ -1,11 +1,16 @@
 package zeusro.specialalarmclock.activity;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Vibrator;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -41,6 +46,7 @@ import zeusro.specialalarmclock.utils.ToastUtils;
 public class AlarmPreferencesActivity extends BaseActivity  implements View.OnClickListener, OnItemClickListener{
     public static final String TAG = "AlarmPreferences";
     public static final String KEY_ALARM = "alarm";
+    public static final int REQUEST_CODE_PERMISSION_READ_EXTERNAL_STORAGE = 111;
     private Alarm alarm;
     private TimePicker timePicker;
     private AlertView mAlertViewExt;
@@ -103,7 +109,9 @@ public class AlarmPreferencesActivity extends BaseActivity  implements View.OnCl
                 ringtonePickerBuilder.setTitle("铃声");
 
                 //Add the desirable ringtone types.
-                ringtonePickerBuilder.addRingtoneType(RingtonePickerDialog.Builder.TYPE_MUSIC);
+                if(checkPermission()){
+                    ringtonePickerBuilder.addRingtoneType(RingtonePickerDialog.Builder.TYPE_MUSIC);
+                }
                 ringtonePickerBuilder.addRingtoneType(RingtonePickerDialog.Builder.TYPE_NOTIFICATION);
                 ringtonePickerBuilder.addRingtoneType(RingtonePickerDialog.Builder.TYPE_RINGTONE);
                 ringtonePickerBuilder.addRingtoneType(RingtonePickerDialog.Builder.TYPE_ALARM);
@@ -131,6 +139,29 @@ public class AlarmPreferencesActivity extends BaseActivity  implements View.OnCl
             }
         });
     }
+
+    private boolean checkPermission() {
+        int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
+        if(permissionCheck== PackageManager.PERMISSION_GRANTED){
+            return true;
+        }else{
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_CODE_PERMISSION_READ_EXTERNAL_STORAGE);
+        }
+        return false;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode){
+            case REQUEST_CODE_PERMISSION_READ_EXTERNAL_STORAGE:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    ToastUtils.show("授权成功，加载更多铃声");
+                }else{
+                    ToastUtils.show("授权失败");
+                }
+        }
+    }
+
     private void initSwitchButtonView() {
         final SwitchButton switchButton = (SwitchButton) findViewById(R.id.shake_switch_btn);
         switchButton.setChecked(alarm.getVibrate());
