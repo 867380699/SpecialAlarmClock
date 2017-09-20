@@ -21,6 +21,7 @@ import zeusro.specialalarmclock.adapter.AlarmAdapter;
 import zeusro.specialalarmclock.bean.Alarm;
 import zeusro.specialalarmclock.receiver.NotificationWakeUpReceiver;
 import zeusro.specialalarmclock.repository.HolidayRepository;
+import zeusro.specialalarmclock.utils.LogUtils;
 
 /**
  * 主activity
@@ -40,6 +41,7 @@ public class AlarmActivity extends BaseActivity{
         Toast.makeText(this, R.string.Thank, Toast.LENGTH_SHORT).show();
         repository = new HolidayRepository(this);
         initView();
+        LogUtils.w(TAG,"2333");
     }
 
     private void initView() {
