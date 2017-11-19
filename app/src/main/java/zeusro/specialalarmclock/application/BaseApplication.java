@@ -4,10 +4,17 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 
+import com.xdandroid.hellodaemon.DaemonEnv;
+
+import zeusro.specialalarmclock.activity.AlarmActivity;
+import zeusro.specialalarmclock.activity.BaseActivity;
 import zeusro.specialalarmclock.receiver.BootReceiver;
+import zeusro.specialalarmclock.service.KeepAliveService;
 
 /**
  *
@@ -26,12 +33,20 @@ public class BaseApplication extends Application {
     }
 
     private static Context context;
+
     @Override
     public void onCreate(){
         super.onCreate();
         this.context=getApplicationContext();
         self = this;
         enableBootReceiver();
+
+        DaemonEnv.initialize(
+                context,  //Application Context.
+                KeepAliveService.class, //刚才创建的 Service 对应的 Class 对象.
+                30*60*1000);  //定时唤醒的时间间隔(ms), 默认 6 分钟.
+        context.startService(new Intent(context, KeepAliveService.class));
+
         this.registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks(){
 
             @Override

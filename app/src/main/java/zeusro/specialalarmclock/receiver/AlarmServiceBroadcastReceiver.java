@@ -14,6 +14,7 @@ import java.util.List;
 
 import zeusro.specialalarmclock.Constants;
 import zeusro.specialalarmclock.Database;
+import zeusro.specialalarmclock.StaticWakeLock;
 import zeusro.specialalarmclock.bean.Alarm;
 import zeusro.specialalarmclock.repository.HolidayRepository;
 import zeusro.specialalarmclock.service.SchedulingService;
@@ -31,6 +32,7 @@ public class AlarmServiceBroadcastReceiver extends WakefulBroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        StaticWakeLock.lockOff(context);
         Log.d(TAG, "onReceive: ");
         long alarmId = intent.getLongExtra("alarm", 0);
         if (alarmId > 0) {
@@ -95,6 +97,7 @@ public class AlarmServiceBroadcastReceiver extends WakefulBroadcastReceiver {
         System.out.println("set id: " + alarm.getId());
         alarmIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        StaticWakeLock.lockOn(context);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             alarmMgr.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, alarm.getAlarmTime(), alarmIntent);
         } else {

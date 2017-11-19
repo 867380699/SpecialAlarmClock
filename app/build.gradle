@@ -30,4 +30,5 @@ dependencies {
     compile 'com.kyleduo.switchbutton:library:1.4.6'
     compile 'com.kevalpatel2106:ringtonepicker:1.1'
     compile 'com.github.markushi:circlebutton:1.1'
+    compile 'com.xdandroid:hellodaemon:+'
 }
