@@ -126,7 +126,7 @@ public class AlarmPreferencesActivity extends BaseActivity  implements View.OnCl
                 ringtonePickerBuilder.setListener(new RingtonePickerListener() {
                     @Override
                     public void OnRingtoneSelected(String ringtoneName, Uri ringtoneUri) {
-                        alarm.setAlarmTonePath(ringtoneUri.getPath());
+                        alarm.setAlarmTonePath(ringtoneUri.toString());
                         alarm.setAlarmToneName(ringtoneName);
                         text2.setText(ringtoneName);
                         setMathAlarm(alarm);

@@ -32,7 +32,6 @@ public class AlarmAlertActivity extends AppCompatActivity implements View.OnClic
     private MediaPlayer mediaPlayer;
     private Vibrator vibrator;
     private boolean alarmActive;
-    private TextView textView;
 
 
 
@@ -40,6 +39,9 @@ public class AlarmAlertActivity extends AppCompatActivity implements View.OnClic
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.alert);
+        View decorView = getWindow().getDecorView();
+        int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+        decorView.setSystemUiVisibility(uiOptions);
         Bundle bundle = this.getIntent().getExtras();
         if (bundle != null) {
             alarm = (Alarm) bundle.getSerializable("alarm");
@@ -48,8 +50,6 @@ public class AlarmAlertActivity extends AppCompatActivity implements View.OnClic
                 startAlarm();
             }
         }
-//        textView = (TextView) findViewById(R.id.textView2);
-//        textView.setText(alarm.toString());
         setSlideView();
         setTelephonyStateChangedListener();
         CircleButton cb= (CircleButton) findViewById(R.id.circle_button);
@@ -100,10 +100,15 @@ public class AlarmAlertActivity extends AppCompatActivity implements View.OnClic
         });
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        alarmActive = true;
+    protected void releaseResources() {
+        if (mediaPlayer != null) {
+            if(mediaPlayer.isPlaying()){
+                mediaPlayer.stop();
+            }
+            mediaPlayer.release();
+            mediaPlayer = null;
+            finish();
+        }
     }
 
     private void startAlarm() {
@@ -142,20 +147,15 @@ public class AlarmAlertActivity extends AppCompatActivity implements View.OnClic
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        alarmActive = true;
+    }
+
+    @Override
     protected void onPause() {
         super.onPause();
         StaticWakeLock.lockOff(this);
-    }
-
-    protected void releaseResources() {
-        if (mediaPlayer != null) {
-            if(mediaPlayer.isPlaying()){
-                mediaPlayer.stop();
-            }
-            mediaPlayer.release();
-            mediaPlayer = null;
-            finish();
-        }
     }
 
     @Override
